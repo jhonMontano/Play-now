@@ -9,7 +9,10 @@ export const registerUser = async (data) => {
   const existingEmail = await User.findOne({ where: { correo } });
   if (existingEmail) throw new Error("The email is already registered");
 
-  return await User.create(data);
+  return await User.create({
+    ...data,
+    password: numeroDocumento, 
+  });
 };
 
 export const getAllUsers = async () => {
