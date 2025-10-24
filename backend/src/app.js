@@ -1,8 +1,16 @@
 import express from "express";
+import cors from "cors"; 
 import user from "./routes/user.js";
 import authRoutes from "./routes/authRoutes.js";
 
 const app = express();
+
+app.use(
+  cors({
+    origin: "http://localhost:8080",
+    credentials: true,
+  })
+);
 
 app.use(express.json());
 
