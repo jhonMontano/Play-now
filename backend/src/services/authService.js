@@ -17,3 +17,8 @@ export const loginUser = async ({ correo, password }) => {
 
   return { token, user };
 };
+
+export const logoutUser = async (token) => {
+  if (!token) throw new Error("Token no proporcionado");
+  await addTokenToBlacklist(token);
+};
