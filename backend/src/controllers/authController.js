@@ -6,12 +6,13 @@ export const login = async (req, res) => {
     const { token, user } = await loginUser({ correo, password });
 
     res.json({
-      message: "Successful login",
+      message: "Inicio de sesión exitoso",
       token,
       user: {
         id: user.id,
         correo: user.correo,
         numeroDocumento: user.numeroDocumento,
+        idRol: user.idRol
       },
     });
   } catch (error) {
