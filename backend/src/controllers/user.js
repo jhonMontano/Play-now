@@ -9,7 +9,7 @@ import {
 export const register = async (req, res) => {
   try {
     const user = await registerUser(req.body);
-    res.status(201).json({ message: "Successfully registered user", user });
+    res.status(201).json({ message: "Usuario registrado exitosamente", user });
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
@@ -36,7 +36,7 @@ export const getUser = async (req, res) => {
 export const editUser = async (req, res) => {
   try {
     const user = await updateUser(req.params.id, req.body);
-    res.json({ message: "Successfully updated user", user });
+    res.json({ message: "Usuario actualizado exitosamente", user });
   } catch (error) {
     res.status(400).json({ message: error.message });
   }

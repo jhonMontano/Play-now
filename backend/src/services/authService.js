@@ -4,10 +4,10 @@ import User from "../models/user.js";
 
 export const loginUser = async ({ correo, password }) => {
   const user = await User.findOne({ where: { correo } });
-  if (!user) throw new Error("Email do not registered");
+  if (!user) throw new Error("Correo no registrado");
 
   const passwordMatch = await bcrypt.compare(password, user.password);
-  if (!passwordMatch) throw new Error("Incorrect password");
+  if (!passwordMatch) throw new Error("Contraseña incorrecta");
 
   const token = jwt.sign(
     { id: user.id, correo: user.correo },
