@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors"; 
 import user from "./routes/user.js";
 import authRoutes from "./routes/authRoutes.js";
+import mallRoutes from "./routes/mallRoutes.js";
 
 const app = express();
 
@@ -20,5 +21,6 @@ app.get("/", (req, res) => {
 
 app.use("/api/users", user);
 app.use("/api/auth", authRoutes);
+app.use("/api/malls", mallRoutes);
 
 export default app;
