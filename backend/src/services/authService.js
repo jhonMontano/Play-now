@@ -10,7 +10,11 @@ export const loginUser = async ({ correo, password }) => {
   if (!passwordMatch) throw new Error("Contraseña incorrecta");
 
   const token = jwt.sign(
-    { id: user.id, correo: user.correo },
+    {
+      id: user.id,
+      correo: user.correo,
+      idRol: user.idRol,
+    },
     process.env.JWT_SECRET,
     { expiresIn: "2h" }
   );

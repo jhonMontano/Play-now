@@ -1,5 +1,5 @@
-import sequelize from "../config/database.js";
 import { DataTypes } from "sequelize";
+import sequelize from "../config/database.js";
 
 const Roles = sequelize.define("Roles", {
   id: {
@@ -10,7 +10,7 @@ const Roles = sequelize.define("Roles", {
   nombre: {
     type: DataTypes.STRING,
     allowNull: false,
-}
+  },
 });
 
 export default Roles;
