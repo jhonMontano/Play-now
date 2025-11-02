@@ -7,9 +7,16 @@ Roles.hasMany(User, { foreignKey: "idRol", as: "usuarios" });
 
 User.belongsTo(Roles, { foreignKey: "idRol", as: "rol" });
 
-Mall.belongsTo(User, { foreignKey: "adminId", as: "administrador" });
+Mall.hasOne(User, { 
+  foreignKey: "idMall", 
+  as: "administrador",
+  constraints: false
+});
 
-User.hasOne(Mall, { foreignKey: "adminId", as: "mallAdministrado" });
+User.belongsTo(Mall, { 
+  foreignKey: "idMall", 
+  as: "mall" 
+});
 
 Mall.hasMany(Court, { foreignKey: "mallId", as: "canchas" });
 
