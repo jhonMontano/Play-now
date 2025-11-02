@@ -51,15 +51,14 @@ export const sendPasswordResetEmail = async (email) => {
 
   const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: "1h" });
 
-  const resetLink = `http://localhost:4000/api/users/reset-password/${token}`;
+  const resetLink = `http://localhost:8080/users/reset-password/${token}`;
 
   const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
+    service: "gmail",    auth: {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASS,
     },
-  });
+});
 
   const mailOptions = {
     from: process.env.EMAIL_USER,
