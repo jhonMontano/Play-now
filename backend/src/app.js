@@ -3,6 +3,8 @@ import cors from "cors";
 import user from "./routes/user.js";
 import authRoutes from "./routes/authRoutes.js";
 import mallRoutes from "./routes/mallRoutes.js";
+import courtRoutes from "./routes/courtRoutes.js";
+import path from "path";
 
 const app = express();
 
@@ -22,5 +24,7 @@ app.get("/", (req, res) => {
 app.use("/api/users", user);
 app.use("/api/auth", authRoutes);
 app.use("/api/malls", mallRoutes);
+app.use("/api/courts", courtRoutes);
+app.use("/uploads", express.static("uploads"));
 
 export default app;
