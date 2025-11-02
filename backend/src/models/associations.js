@@ -16,3 +16,4 @@ Mall.hasMany(Court, { foreignKey: "mallId", as: "canchas" });
 Court.belongsTo(Mall, { foreignKey: "mallId", as: "mall" });
 
 export { Roles, User, Mall, Court };
+
