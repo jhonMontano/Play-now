@@ -3,7 +3,6 @@ import Mall from "../models/mall.js";
 import fs from "fs";
 import path from "path";
 
-
 export const createCourtService = async (admin, body, file) => {
     if (admin.idRol !== 2) {
         throw new Error("Solo el administrador puede registrar canchas");

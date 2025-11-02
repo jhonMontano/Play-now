@@ -26,14 +26,4 @@ const Mall = sequelize.define("Mall", {
   },
 });
 
-Mall.hasOne(User, {
-  foreignKey: "idMall",
-  as: "administrador",
-});
-
-User.belongsTo(Mall, {
-  foreignKey: "idMall",
-  as: "mall",
-});
-
 export default Mall;
