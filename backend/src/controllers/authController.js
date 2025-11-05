@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import { addTokenToBlacklist } from "../models/tokenBlacklist.js";
-import { loginUser } from "../services/authService.js";
+import { loginUser, changePasswordService  } from "../services/authService.js";
 
 export const login = async (req, res) => {
   try {
@@ -28,4 +28,20 @@ export const logout = (req, res) => {
 
   addTokenToBlacklist(token);
   res.json({ message: "Sesión cerrada correctamente" });
+};
+
+export const changePassword = async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ message: "Los campos son obligatorios" });
+    }
+
+    await changePasswordService(req.user.id, currentPassword, newPassword);
+
+    res.json({ message: "Contraseña actualizada exitosamente" });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
 };
