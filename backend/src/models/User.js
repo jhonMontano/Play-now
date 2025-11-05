@@ -46,8 +46,17 @@ const User = sequelize.define("User", {
   },
   idMall: {
     type: DataTypes.INTEGER,
-    allowNull: true, 
+    allowNull: true,
   },
+  intentosFallidos: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0,
+  },
+
+  bloqueadoHasta: {
+    type: DataTypes.DATE,
+    allowNull: true,
+  }
 });
 
 User.beforeCreate(async (user) => {
