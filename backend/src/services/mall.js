@@ -60,7 +60,7 @@ export const getAllMallsService = async () => {
     include: {
       model: User,
       as: "administrador",
-      attributes: ["id", "primerNombre", "segundoNombre", "primerApellido", "segundoApellido", "correo", "celular", "idRol"],
+      attributes: ["id", "primerNombre", "segundoNombre", "primerApellido", "segundoApellido", "correo", "celular", "idRol","activo"],
     },
     order: [["nombreCentro", "ASC"]],
   });
