@@ -56,7 +56,13 @@ const User = sequelize.define("User", {
   bloqueadoHasta: {
     type: DataTypes.DATE,
     allowNull: true,
-  }
+  },
+
+  activo: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: true
+  },
 });
 
 User.beforeCreate(async (user) => {
