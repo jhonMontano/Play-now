@@ -18,7 +18,8 @@ export const createCourtService = async (admin, body, file) => {
         direccion,
         responsable,
         detalles,
-        capacidad
+        capacidad,
+        mallId,
     } = body;
 
     const requiredFields = [
@@ -31,6 +32,7 @@ export const createCourtService = async (admin, body, file) => {
         "direccion",
         "responsable",
         "capacidad",
+        "mallId",
     ];
 
     for (const field of requiredFields) {
@@ -38,6 +40,15 @@ export const createCourtService = async (admin, body, file) => {
             throw new Error(`El campo ${field} es obligatorio`);
         }
     }
+
+    const mall = await Mall.findByPk(mallId);
+    if (!mall) {
+        throw new Error("El centro comercial especificado no existe");
+    }
+
+    /*if (admin.idMall !== mall.id) {
+        throw new Error("No puedes crear canchas en un centro comercial que no administras");
+    }*/
 
     if (isNaN(valorHora) || Number(valorHora) <= 0) {
         throw new Error("El valor por hora debe ser un número positivo");
@@ -61,18 +72,17 @@ export const createCourtService = async (admin, body, file) => {
         detalles,
         capacidad,
         imagen,
-        mallId: admin.idMall,
+        mallId,
     });
 
     return newCourt;
 };
 
 export const getCourtsService = async (user) => {
-
     if (user.idRol === 1 || user.idRol === 2) {
         return await Court.findAll({
             include: { model: Mall, as: "mall", attributes: ["nombreCentro"] },
-            order: [["id", "ASC"]]
+            order: [["id", "ASC"]],
         });
     }
 
@@ -99,7 +109,6 @@ export const deleteCourtService = async (id) => {
 
     if (cancha.imagen) {
         const filePath = path.join(process.cwd(), "uploads", cancha.imagen);
-
         try {
             if (fs.existsSync(filePath)) {
                 fs.unlinkSync(filePath);
@@ -112,4 +121,27 @@ export const deleteCourtService = async (id) => {
 
     await cancha.destroy();
     return true;
+};
+
+export const getCourtsByMallIdService = async (mallId, user) => {
+    if (!mallId) throw new Error("Debe proporcionar el ID del centro comercial");
+
+    const mall = await Mall.findByPk(mallId);
+    if (!mall) throw new Error("Centro comercial no encontrado");
+
+    /*if (user.idRol === 2 && user.idMall !== mall.id) {
+        throw new Error("No tienes permisos para ver las canchas de este centro comercial");
+    }*/
+
+    const canchas = await Court.findAll({
+        where: { mallId },
+        include: {
+            model: Mall,
+            as: "mall",
+            attributes: ["id", "nombreCentro", "ciudad"],
+        },
+        order: [["nombreCancha", "ASC"]],
+    });
+
+    return canchas;
 };
