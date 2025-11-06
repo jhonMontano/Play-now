@@ -2,11 +2,15 @@ import { Router } from "express";
 import multer from "multer";
 import { authenticateToken } from "../middlewares/authMiddleware.js";
 import {
-  createCourt, getCourts, getCourtById, updateCourt, deleteCourt
+  createCourt, 
+  getCourts, 
+  getCourtById, 
+  updateCourt, 
+  deleteCourt,
+  getCourtsByMallId
 } from "../controllers/court.js";
 
 const router = Router();
-
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, "uploads/"),
@@ -29,6 +33,7 @@ const upload = multer({
 
 router.post("/", authenticateToken, upload.single("imagen"), createCourt);
 router.get("/", authenticateToken, getCourts);
+router.get("/mall/:mallId", authenticateToken, getCourtsByMallId); 
 router.get("/:id", authenticateToken, getCourtById);
 router.put("/:id", authenticateToken, updateCourt);
 router.delete("/:id", authenticateToken, deleteCourt);
