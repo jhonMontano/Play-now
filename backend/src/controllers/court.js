@@ -3,7 +3,8 @@ import {
   getCourtsService,
   getCourtByIdService,
   updateCourtService,
-  deleteCourtService
+  deleteCourtService,
+  getCourtsByMallIdService
 } from "../services/court.js";
 
 export const createCourt = async (req, res) => {
@@ -48,5 +49,15 @@ export const deleteCourt = async (req, res) => {
     res.json({ message: "Cancha eliminada" });
   } catch (error) {
     res.status(404).json({ message: error.message });
+  }
+};
+
+export const getCourtsByMallId = async (req, res) => {
+  try {
+    const { mallId } = req.params;
+    const canchas = await getCourtsByMallIdService(mallId, req.user);
+    res.status(200).json(canchas);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
   }
 };
