@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import { addTokenToBlacklist } from "../models/tokenBlacklist.js";
-import { loginUser, changePasswordService  } from "../services/authService.js";
+import { loginUser, changePasswordService } from "../services/authService.js";
 
 export const login = async (req, res) => {
   try {
@@ -15,6 +15,7 @@ export const login = async (req, res) => {
         correo: user.correo,
         numeroDocumento: user.numeroDocumento,
         idRol: user.idRol,
+        mallId: user.idMall
       },
     });
   } catch (error) {
