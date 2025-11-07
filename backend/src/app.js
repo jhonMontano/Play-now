@@ -5,6 +5,7 @@ import authRoutes from "./routes/authRoutes.js";
 import mallRoutes from "./routes/mallRoutes.js";
 import courtRoutes from "./routes/courtRoutes.js";
 import path from "path";
+import reservationRoutes from "./routes/reservationRoutes.js";
 
 const app = express();
 
@@ -26,5 +27,6 @@ app.use("/api/auth", authRoutes);
 app.use("/api/malls", mallRoutes);
 app.use("/api/courts", courtRoutes);
 app.use("/uploads", express.static("uploads"));
+app.use("/api/reservations", reservationRoutes);
 
 export default app;
