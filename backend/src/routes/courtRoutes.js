@@ -35,7 +35,7 @@ router.post("/", authenticateToken, upload.single("imagen"), createCourt);
 router.get("/", authenticateToken, getCourts);
 router.get("/mall/:mallId", authenticateToken, getCourtsByMallId); 
 router.get("/:id", authenticateToken, getCourtById);
-router.put("/:id", authenticateToken, updateCourt);
+router.put("/:id", authenticateToken, upload.single("imagen"), updateCourt);
 router.delete("/:id", authenticateToken, deleteCourt);
 
 export default router;
