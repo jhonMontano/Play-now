@@ -114,9 +114,11 @@ export const updateMallService = async (user, id, data) => {
   if (mall) {
     const allowedMallFields = ["nombreCentro", "direccion", "telefono", "ciudad"];
     const mallData = {};
+
     for (const field of allowedMallFields) {
-      if (mall[field]) mallData[field] = mall[field];
+      if (mall.hasOwnProperty(field)) mallData[field] = mall[field];
     }
+
     await existingMall.update(mallData);
   }
 
@@ -135,7 +137,7 @@ export const updateMallService = async (user, id, data) => {
 
     const adminData = {};
     for (const field of allowedAdminFields) {
-      if (admin[field]) adminData[field] = admin[field];
+      if (admin.hasOwnProperty(field)) adminData[field] = admin[field];
     }
 
     await existingMall.administrador.update(adminData);
