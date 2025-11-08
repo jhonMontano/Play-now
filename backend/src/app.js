@@ -6,6 +6,7 @@ import mallRoutes from "./routes/mallRoutes.js";
 import courtRoutes from "./routes/courtRoutes.js";
 import path from "path";
 import reservationRoutes from "./routes/reservationRoutes.js";
+import setupSwagger from "./config/swagger.js";
 
 const app = express();
 
@@ -17,6 +18,8 @@ app.use(
 );
 
 app.use(express.json());
+
+setupSwagger(app);
 
 app.get("/", (req, res) => {
   res.send("Servidor PlayNow funcionando correctamente");
