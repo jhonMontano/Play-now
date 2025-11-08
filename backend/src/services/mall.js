@@ -103,7 +103,7 @@ export const getMallByIdService = async (id) => {
 };
 
 export const updateMallService = async (user, id, data) => {
-  if (user.idRol !== 2)
+  if (user.idRol !== 1)
     throw new Error("Acceso denegado. Solo el super administrador puede actualizar centros comerciales");
 
   const existingMall = await Mall.findByPk(id, { include: { model: User, as: "administrador" } });
