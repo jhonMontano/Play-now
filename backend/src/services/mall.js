@@ -26,9 +26,9 @@ export const createMallAndAdminService = async (creatorUser, mallData, adminData
       const mallName = assignedMall
         ? capitalizeWords(assignedMall.nombreCentro)
         : `ID ${existingAdmin.idMall}`;
-      throw new Error(`El usuario ${adminData.correo} ya es administrador del centro comercial "${mallName}".`);
+      throw new Error(`El usuario ${adminData.correo} ya es administrador del centro comercial "${mallName}"`);
     }
-    throw new Error(`El usuario ${adminData.correo} ya existe y no puede ser reasignado.`);
+    throw new Error(`El usuario ${adminData.correo} ya existe y no puede ser reasignado`);
   }
 
   const newMall = await Mall.create({
@@ -39,7 +39,7 @@ export const createMallAndAdminService = async (creatorUser, mallData, adminData
   });
 
   const rolAdmin = await Roles.findOne({ where: { nombre: "admin" } });
-  if (!rolAdmin) throw new Error("No se encontró el rol de administrador.");
+  if (!rolAdmin) throw new Error("No se encontró el rol de administrador");
 
   const newAdmin = await User.create({
     ...adminData,
@@ -98,16 +98,16 @@ export const getMallByIdService = async (id) => {
       ],
     },
   });
-  if (!mall) throw new Error("Centro comercial no encontrado.");
+  if (!mall) throw new Error("Centro comercial no encontrado");
   return mall;
 };
 
 export const updateMallService = async (user, id, data) => {
   if (user.idRol !== 2)
-    throw new Error("Acceso denegado. Solo el super administrador puede actualizar centros comerciales.");
+    throw new Error("Acceso denegado. Solo el super administrador puede actualizar centros comerciales");
 
   const existingMall = await Mall.findByPk(id, { include: { model: User, as: "administrador" } });
-  if (!existingMall) throw new Error("Centro comercial no encontrado.");
+  if (!existingMall) throw new Error("Centro comercial no encontrado");
 
   const { mall, admin } = data;
 
@@ -163,10 +163,10 @@ export const updateMallService = async (user, id, data) => {
 
 export const deleteMallService = async (user, id) => {
   if (user.idRol !== 1)
-    throw new Error("Acceso denegado. Solo el super administrador puede eliminar centros comerciales.");
+    throw new Error("Acceso denegado. Solo el super administrador puede eliminar centros comerciales");
 
   const mall = await Mall.findByPk(id);
-  if (!mall) throw new Error("Centro comercial no encontrado.");
+  if (!mall) throw new Error("Centro comercial no encontrado");
 
   const admin = await User.findOne({ where: { idMall: mall.id } });
   if (admin) {
