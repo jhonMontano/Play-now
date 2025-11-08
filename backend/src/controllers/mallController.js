@@ -11,7 +11,7 @@ export const createMallAndAdmin = async (req, res) => {
     const { mall, admin } = req.body;
     const { newMall, newAdmin } = await createMallAndAdminService(req.user, mall, admin);
     res.status(201).json({
-      message: "Centro comercial y administrador creados correctamente.",
+      message: "Centro comercial y administrador creados correctamente",
       mall: newMall,
       administrador: newAdmin,
     });

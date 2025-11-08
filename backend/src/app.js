@@ -32,4 +32,5 @@ app.use("/api/courts", courtRoutes);
 app.use("/api/uploads", express.static("uploads"));
 app.use("/api/reservations", reservationRoutes);
 
+
 export default app;
