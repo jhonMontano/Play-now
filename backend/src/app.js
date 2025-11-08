@@ -29,7 +29,8 @@ app.use("/api/users", user);
 app.use("/api/auth", authRoutes);
 app.use("/api/malls", mallRoutes);
 app.use("/api/courts", courtRoutes);
-app.use("/uploads", express.static("uploads"));
+app.use("/api/uploads", express.static("uploads"));
 app.use("/api/reservations", reservationRoutes);
+
 
 export default app;
