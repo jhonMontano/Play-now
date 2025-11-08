@@ -36,8 +36,8 @@ export const getCourtById = async (req, res) => {
 
 export const updateCourt = async (req, res) => {
   try {
-    const cancha = await updateCourtService(req.params.id, req.body);
-    res.json({ message: "Cancha actualizada", cancha });
+    const cancha = await updateCourtService(req.params.id, req.body, req.file);
+    res.json({ message: "Cancha actualizada correctamente", cancha });
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
@@ -46,7 +46,7 @@ export const updateCourt = async (req, res) => {
 export const deleteCourt = async (req, res) => {
   try {
     await deleteCourtService(req.params.id);
-    res.json({ message: "Cancha eliminada" });
+    res.json({ message: "Cancha eliminada correctamente" });
   } catch (error) {
     res.status(404).json({ message: error.message });
   }

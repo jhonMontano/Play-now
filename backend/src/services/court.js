@@ -46,10 +46,6 @@ export const createCourtService = async (admin, body, file) => {
         throw new Error("El centro comercial especificado no existe");
     }
 
-    /*if (admin.idMall !== mall.id) {
-        throw new Error("No puedes crear canchas en un centro comercial que no administras");
-    }*/
-
     if (isNaN(valorHora) || Number(valorHora) <= 0) {
         throw new Error("El valor por hora debe ser un número positivo");
     }
@@ -95,9 +91,34 @@ export const getCourtByIdService = async (id) => {
     return cancha;
 };
 
-export const updateCourtService = async (id, data) => {
+export const updateCourtService = async (id, data, file) => {
     const cancha = await Court.findByPk(id);
     if (!cancha) throw new Error("Cancha no encontrada");
+
+    if (data.mallId && data.mallId !== cancha.mallId) {
+        const mall = await Mall.findByPk(data.mallId);
+        if (!mall) {
+            throw new Error("El centro comercial especificado no existe");
+        }
+    }
+
+    if (file) {
+        if (cancha.imagen) {
+            const oldPath = path.join(process.cwd(), "uploads", cancha.imagen);
+            if (fs.existsSync(oldPath)) {
+                fs.unlinkSync(oldPath);
+            }
+        }
+        data.imagen = file.filename;
+    }
+
+    if (data.valorHora && (isNaN(data.valorHora) || Number(data.valorHora) <= 0)) {
+        throw new Error("El valor por hora debe ser un número positivo");
+    }
+
+    if (data.telefono && !/^\d{10}$/.test(data.telefono)) {
+        throw new Error("El teléfono debe tener 10 dígitos numéricos");
+    }
 
     await cancha.update(data);
     return cancha;
@@ -129,9 +150,9 @@ export const getCourtsByMallIdService = async (mallId, user) => {
     const mall = await Mall.findByPk(mallId);
     if (!mall) throw new Error("Centro comercial no encontrado");
 
-    /*if (user.idRol === 2 && user.idMall !== mall.id) {
+    if (user.idRol != 2 && user.idMall !== mall.id) {
         throw new Error("No tienes permisos para ver las canchas de este centro comercial");
-    }*/
+    }
 
     const canchas = await Court.findAll({
         where: { mallId },
