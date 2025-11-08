@@ -36,6 +36,7 @@ export const loginUser = async ({ correo, password }) => {
       id: user.id,
       correo: user.correo,
       idRol: user.idRol,
+      mallId: user.idMall
     },
     process.env.JWT_SECRET,
     { expiresIn: "2h" }

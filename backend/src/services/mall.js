@@ -60,7 +60,7 @@ export const getAllMallsService = async () => {
     include: {
       model: User,
       as: "administrador",
-      attributes: ["id", "primerNombre", "segundoNombre", "primerApellido", "segundoApellido", "correo", "celular", "idRol","activo"],
+      attributes: ["id", "primerNombre", "segundoNombre", "primerApellido", "segundoApellido", "correo", "celular", "idRol","activo", "numeroDocumento", "tipoDocumento", "direccion"],
     },
     order: [["nombreCentro", "ASC"]],
   });
@@ -71,7 +71,7 @@ export const getMallByIdService = async (id) => {
     include: {
       model: User,
       as: "administrador",
-      attributes: ["id", "primerNombre", "segundoNombre", "primerApellido", "segundoApellido", "correo", "celular", "idRol"],
+      attributes: ["id", "primerNombre", "segundoNombre", "primerApellido", "segundoApellido", "correo", "celular", "idRol","activo", "numeroDocumento", "tipoDocumento", "direccion"],
     },
   });
   if (!mall) throw new Error("Centro comercial no encontrado.");
