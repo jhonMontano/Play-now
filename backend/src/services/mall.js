@@ -5,9 +5,8 @@ import Roles from "../models/roles.js";
 const capitalizeWords = (str) => str.replace(/\b\w/g, (c) => c.toUpperCase());
 
 export const createMallAndAdminService = async (creatorUser, mallData, adminData) => {
-  if (creatorUser.idRol !== 1) {
+  if (creatorUser.idRol !== 1)
     throw new Error("Acceso denegado. Solo el super administrador puede crear centros comerciales.");
-  }
 
   const requiredMallFields = ["nombreCentro", "direccion", "telefono", "ciudad"];
   for (const field of requiredMallFields) {
@@ -17,9 +16,8 @@ export const createMallAndAdminService = async (creatorUser, mallData, adminData
   const existingMall = await Mall.findOne({
     where: { nombreCentro: mallData.nombreCentro.toLowerCase() },
   });
-  if (existingMall) {
+  if (existingMall)
     throw new Error(`Ya existe un centro comercial con el nombre "${capitalizeWords(existingMall.nombreCentro)}".`);
-  }
 
   const existingAdmin = await User.findOne({ where: { correo: adminData.correo } });
   if (existingAdmin) {
@@ -60,7 +58,20 @@ export const getAllMallsService = async () => {
     include: {
       model: User,
       as: "administrador",
-      attributes: ["id", "primerNombre", "segundoNombre", "primerApellido", "segundoApellido", "correo", "celular", "idRol","activo", "numeroDocumento", "tipoDocumento", "direccion"],
+      attributes: [
+        "id",
+        "primerNombre",
+        "segundoNombre",
+        "primerApellido",
+        "segundoApellido",
+        "correo",
+        "celular",
+        "idRol",
+        "activo",
+        "numeroDocumento",
+        "tipoDocumento",
+        "direccion",
+      ],
     },
     order: [["nombreCentro", "ASC"]],
   });
@@ -71,7 +82,20 @@ export const getMallByIdService = async (id) => {
     include: {
       model: User,
       as: "administrador",
-      attributes: ["id", "primerNombre", "segundoNombre", "primerApellido", "segundoApellido", "correo", "celular", "idRol","activo", "numeroDocumento", "tipoDocumento", "direccion"],
+      attributes: [
+        "id",
+        "primerNombre",
+        "segundoNombre",
+        "primerApellido",
+        "segundoApellido",
+        "correo",
+        "celular",
+        "idRol",
+        "activo",
+        "numeroDocumento",
+        "tipoDocumento",
+        "direccion",
+      ],
     },
   });
   if (!mall) throw new Error("Centro comercial no encontrado.");
@@ -79,17 +103,67 @@ export const getMallByIdService = async (id) => {
 };
 
 export const updateMallService = async (user, id, data) => {
-  if (user.idRol !== 1) throw new Error("Acceso denegado. Solo el super administrador puede actualizar centros comerciales.");
+  if (user.idRol !== 2)
+    throw new Error("Acceso denegado. Solo el super administrador puede actualizar centros comerciales.");
 
-  const mall = await Mall.findByPk(id);
-  if (!mall) throw new Error("Centro comercial no encontrado.");
+  const existingMall = await Mall.findByPk(id, { include: { model: User, as: "administrador" } });
+  if (!existingMall) throw new Error("Centro comercial no encontrado.");
 
-  await mall.update(data);
-  return mall;
+  const { mall, admin } = data;
+
+  if (mall) {
+    const allowedMallFields = ["nombreCentro", "direccion", "telefono", "ciudad"];
+    const mallData = {};
+    for (const field of allowedMallFields) {
+      if (mall[field]) mallData[field] = mall[field];
+    }
+    await existingMall.update(mallData);
+  }
+
+  if (admin && existingMall.administrador) {
+    const allowedAdminFields = [
+      "primerNombre",
+      "segundoNombre",
+      "primerApellido",
+      "segundoApellido",
+      "correo",
+      "celular",
+      "numeroDocumento",
+      "tipoDocumento",
+      "direccion",
+    ];
+
+    const adminData = {};
+    for (const field of allowedAdminFields) {
+      if (admin[field]) adminData[field] = admin[field];
+    }
+
+    await existingMall.administrador.update(adminData);
+  }
+
+  return await Mall.findByPk(id, {
+    include: {
+      model: User,
+      as: "administrador",
+      attributes: [
+        "id",
+        "primerNombre",
+        "segundoNombre",
+        "primerApellido",
+        "segundoApellido",
+        "correo",
+        "celular",
+        "numeroDocumento",
+        "tipoDocumento",
+        "direccion",
+      ],
+    },
+  });
 };
 
 export const deleteMallService = async (user, id) => {
-  if (user.idRol !== 1) throw new Error("Acceso denegado. Solo el super administrador puede eliminar centros comerciales.");
+  if (user.idRol !== 1)
+    throw new Error("Acceso denegado. Solo el super administrador puede eliminar centros comerciales.");
 
   const mall = await Mall.findByPk(id);
   if (!mall) throw new Error("Centro comercial no encontrado.");
