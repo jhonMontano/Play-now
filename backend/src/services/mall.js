@@ -1,6 +1,7 @@
 import Mall from "../models/mall.js";
 import User from "../models/user.js";
 import Roles from "../models/roles.js";
+import Court from "../models/court.js";
 
 const capitalizeWords = (str) => str.replace(/\b\w/g, (c) => c.toUpperCase());
 
@@ -169,6 +170,14 @@ export const deleteMallService = async (user, id) => {
 
   const mall = await Mall.findByPk(id);
   if (!mall) throw new Error("Centro comercial no encontrado");
+
+  const existingCourts = await Court.findOne({ where: { mallId: mall.id } });
+  if (existingCourts) {
+    throw new Error(
+      "No se puede eliminar el centro comercial porque tiene canchas asociadas. " +
+      "Elimina o reasigna las canchas antes de continuar."
+    );
+  }
 
   const admin = await User.findOne({ where: { idMall: mall.id } });
   if (admin) {
