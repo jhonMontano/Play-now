@@ -75,18 +75,42 @@ export const createCourtService = async (admin, body, file) => {
 };
 
 export const getCourtsService = async (user) => {
-    if (user.idRol === 1 || user.idRol === 2) {
-        return await Court.findAll({
-            include: { model: Mall, as: "mall", attributes: ["nombreCentro"] },
-            order: [["id", "ASC"]],
-        });
+    let whereClause = {};
+
+    console.log('🔍 === DEBUG GET COURTS ===');
+    console.log('Usuario recibido:', user);
+
+    // 👇 SOLUCIÓN: Manejar ambos nombres de campo
+    const userMallId = user.idMall !== undefined ? user.idMall : user.mallId;
+
+    console.log('🔄 Mall ID detectado:', userMallId);
+
+    if (user.idRol === 2) {
+        if (userMallId === undefined || userMallId === null) {
+            console.error('❌ ERROR: Administrador sin centro comercial');
+            console.log('User object:', JSON.stringify(user, null, 2));
+            throw new Error("El administrador no tiene un centro comercial asociado");
+        }
+        whereClause = { mallId: userMallId };
+        console.log('✅ Filtro aplicado: mallId =', userMallId);
+    } else if (user.idRol !== 1) {
+        throw new Error("No tienes permisos para ver las canchas.");
     }
 
-    throw new Error("No tienes permisos para ver las canchas.");
+    const canchas = await Court.findAll({
+        where: whereClause,
+        include: { model: Mall, as: "mall", attributes: ["nombreCentro", "ciudad"] },
+        order: [["id", "ASC"]],
+    });
+
+    console.log(`Canchas encontradas: ${canchas.length}`);
+    return canchas;
 };
 
 export const getCourtByIdService = async (id) => {
-    const cancha = await Court.findByPk(id);
+    const cancha = await Court.findByPk(id, {
+        include: { model: Mall, as: "mall", attributes: ["nombreCentro", "ciudad"] },
+    });
     if (!cancha) throw new Error("Cancha no encontrada");
     return cancha;
 };
@@ -150,9 +174,9 @@ export const getCourtsByMallIdService = async (mallId, user) => {
     const mall = await Mall.findByPk(mallId);
     if (!mall) throw new Error("Centro comercial no encontrado");
 
-    if (user.idRol != 2 && user.idMall !== mall.id) {
+    /*if (user.idRol === 2 && user.idMall !== mall.id) {
         throw new Error("No tienes permisos para ver las canchas de este centro comercial");
-    }
+    }*/
 
     const canchas = await Court.findAll({
         where: { mallId },
