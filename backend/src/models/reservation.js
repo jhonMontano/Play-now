@@ -1,13 +1,15 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../config/database.js";
-import User from "./user.js";
-import Court from "./court.js";
 
 const Reservation = sequelize.define("Reservation", {
   id: {
     type: DataTypes.INTEGER,
     autoIncrement: true,
     primaryKey: true,
+  },
+  fechaReserva: {
+    type: DataTypes.DATEONLY,
+    allowNull: false,
   },
   horaReserva: {
     type: DataTypes.STRING,
