@@ -13,7 +13,6 @@ User.hasOne(Mall, { foreignKey: "adminId", as: "mallAdministrado" });
 Mall.hasMany(Court, { foreignKey: "mallId", as: "canchas" });
 Court.belongsTo(Mall, { foreignKey: "mallId", as: "mall" });
 
-
 Court.hasMany(Reservation, { foreignKey: "courtId", as: "reservas" });
 Reservation.belongsTo(Court, { foreignKey: "courtId", as: "cancha" });
 
