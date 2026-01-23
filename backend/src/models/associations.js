@@ -3,6 +3,7 @@ import User from "./user.js";
 import Mall from "./mall.js";
 import Court from "./court.js";
 import Reservation from "./reservation.js";
+import Sport from "./sport.js";
 
 Roles.hasMany(User, { foreignKey: "idRol", as: "usuarios" });
 User.belongsTo(Roles, { foreignKey: "idRol", as: "rol" });
@@ -19,4 +20,7 @@ Reservation.belongsTo(Court, { foreignKey: "courtId", as: "cancha" });
 User.hasMany(Reservation, { foreignKey: "userId", as: "reservas" });
 Reservation.belongsTo(User, { foreignKey: "userId", as: "cliente" });
 
-export { Roles, User, Mall, Court, Reservation};
+Sport.hasMany(Court, { foreignKey: "sportId", as: "canchas" });
+Court.belongsTo(Sport, { foreignKey: "sportId", as: "deporte" })
+
+export { Roles, User, Mall, Court, Reservation };
