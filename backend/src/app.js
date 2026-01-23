@@ -7,6 +7,7 @@ import courtRoutes from "./routes/courtRoutes.js";
 import path from "path";
 import reservationRoutes from "./routes/reservationRoutes.js";
 import setupSwagger from "./config/swagger.js";
+import sporRoutes from "./routes/sportRoutes.js";
 
 const app = express();
 
@@ -31,6 +32,7 @@ app.use("/api/malls", mallRoutes);
 app.use("/api/courts", courtRoutes);
 app.use("/api/uploads", express.static("uploads"));
 app.use("/api/reservations", reservationRoutes);
+app.use("/api/sports", sporRoutes);
 
 
 export default app;
