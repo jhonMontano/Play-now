@@ -8,6 +8,7 @@ import path from "path";
 import reservationRoutes from "./routes/reservationRoutes.js";
 import setupSwagger from "./config/swagger.js";
 import sporRoutes from "./routes/sportRoutes.js";
+import adminStatsRoutes from "./routes/adminStatsRoutes.js";
 
 const app = express();
 
@@ -33,6 +34,7 @@ app.use("/api/courts", courtRoutes);
 app.use("/api/uploads", express.static("uploads"));
 app.use("/api/reservations", reservationRoutes);
 app.use("/api/sports", sporRoutes);
+app.use("/api/admin/stats", adminStatsRoutes);
 
 
 export default app;
