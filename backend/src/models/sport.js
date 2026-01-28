@@ -16,6 +16,10 @@ const Sport = sequelize.define("Sport", {
         type: DataTypes.STRING,
         allowNull: true
     },
+    cantidad: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+    },
     activo: {
         type: DataTypes.BOOLEAN,
         defaultValue: true
