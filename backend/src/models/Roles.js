@@ -14,4 +14,3 @@ const Roles = sequelize.define("Roles", {
 });
 
 export default Roles;
- 
