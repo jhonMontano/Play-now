@@ -2,12 +2,33 @@ import { getAdminStatsService } from "../services/adminStats.js";
 
 export const getAdminStats = async (req, res) => {
     try {
-        const { mallId, startDate, endDate } = req.query;
-
-        const stats = await getAdminStatsService({
+        const { idRol, mallId: mallFromToken } = req.user;
+        const {
             mallId,
             startDate,
-            endDate
+            endDate,
+            estado,
+            courtId
+        } = req.query;
+
+        let finalMallId = mallId;
+
+        if (idRol === 2) {
+            finalMallId = mallFromToken;
+        } else if (idRol === 1) {
+            finalMallId = mallId || undefined;
+        } else {
+            return res.status(403).json({
+                message: "No tienes permisos para acceder a este recurso"
+            });
+        }
+
+        const stats = await getAdminStatsService({
+            mallId: finalMallId,
+            startDate,
+            endDate,
+            estado,
+            courtId
         });
 
         res.json({

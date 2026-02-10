@@ -3,8 +3,16 @@ import Court from "../models/court.js";
 import Mall from "../models/mall.js";
 import { Op, fn, col } from "sequelize";
 
-export const getAdminStatsService = async ({ mallId, startDate, endDate }) => {
+export const getAdminStatsService = async ({
+    mallId,
+    startDate,
+    endDate,
+    estado,
+    courtId
+}) => {
     const where = {};
+
+    if (estado) where.estado = estado;
 
     if (startDate && endDate) {
         where.fechaReserva = {
@@ -12,15 +20,19 @@ export const getAdminStatsService = async ({ mallId, startDate, endDate }) => {
         };
     }
 
-    if (mallId) {
-        where["$cancha.mall.id$"] = mallId;
+    if (courtId !== undefined && courtId !== null) {
+        where["$cancha.id$"] = Number(courtId);
     }
 
-    const stats = await Reservation.findAll({
+    if (mallId !== undefined && mallId !== null) {
+        where["$cancha.mall.id$"] = Number(mallId);
+    }
+
+    return await Reservation.findAll({
         where,
         attributes: [
             "estado",
-            [fn("COUNT", col("Reservation.id")), "total"],
+            [fn("COUNT", fn("DISTINCT", col("Reservation.id"))), "total reservas"],
             [fn("SUM", col("valorTotal")), "ingresos"]
         ],
         include: [
@@ -39,6 +51,5 @@ export const getAdminStatsService = async ({ mallId, startDate, endDate }) => {
         ],
         group: ["estado"]
     });
-
-    return stats;
 };
+
