@@ -1,5 +1,5 @@
 import express from "express";
-import cors from "cors"; 
+import cors from "cors";
 import user from "./routes/user.js";
 import authRoutes from "./routes/authRoutes.js";
 import mallRoutes from "./routes/mallRoutes.js";
@@ -36,6 +36,5 @@ app.use("/api/reservations", reservationRoutes);
 app.use("/api/sports", sporRoutes);
 app.use("/api/admin/stats", adminStatsRoutes);
 app.use("/api/roles", roleRoutes);
-
 
 export default app;
