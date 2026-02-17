@@ -1,4 +1,4 @@
-import Roles from "../models/roles.js";
+import Roles from "../models/Roles.js";
 
 export const createRolesService = async (data) => {
     return await Roles.create(data);
