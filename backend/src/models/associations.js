@@ -1,4 +1,4 @@
-import Roles from "./Roles.js";
+import Roles from "./roles.js";
 import User from "./user.js";
 import Mall from "./mall.js";
 import Court from "./court.js";
