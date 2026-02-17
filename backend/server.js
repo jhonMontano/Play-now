@@ -1,6 +1,6 @@
 import app from "./src/app.js";
 import sequelize from "./src/config/database.js";
-import Roles from "./src/models/Roles.js";
+import Roles from "./src/models/roles.js";
 import "./src/models/associations.js";
 
 const PORT = process.env.PORT || 4000;
