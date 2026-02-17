@@ -1,6 +1,6 @@
 import Mall from "../models/mall.js";
 import User from "../models/user.js";
-import Roles from "../models/roles.js";
+import Roles from "../models/Roles.js";
 import Court from "../models/court.js";
 
 const capitalizeWords = (str) => str.replace(/\b\w/g, (c) => c.toUpperCase());
