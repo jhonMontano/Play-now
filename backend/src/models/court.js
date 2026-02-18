@@ -53,5 +53,4 @@ const Court = sequelize.define("Court", {
   },
 });
 
-
 export default Court;
