@@ -33,9 +33,9 @@ if (isProduction && process.env.DATABASE_URL) {
 
 try {
   await sequelize.authenticate();
-  console.log("✅ Conexión exitosa con la base de datos PostgreSQL");
+  console.log("Conexión exitosa con la base de datos PostgreSQL");
 } catch (error) {
-  console.error("❌ Error al conectar con la base de datos:", error.message);
+  console.error("Error al conectar con la base de datos:", error.message);
   console.error("Detalles completos:", error);
 }
 
