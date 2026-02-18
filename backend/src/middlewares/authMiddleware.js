@@ -12,15 +12,14 @@ export const authenticateToken = (req, res, next) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     
-    // 👇 CORRECCIÓN: Mapear los campos correctamente
     req.user = {
       id: decoded.id,
       correo: decoded.correo,
       idRol: decoded.idRol,
-      idMall: decoded.mallId || decoded.idMall // ← Maneja ambos casos
+      idMall: decoded.mallId || decoded.idMall
     };
     
-    console.log('🔐 User autenticado:', req.user); // ← Debug
+    console.log('🔐 User autenticado:', req.user);
     next();
   } catch (error) {
     res.status(403).json({ message: "Token inválido o expirado" });

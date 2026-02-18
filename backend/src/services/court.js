@@ -77,22 +77,21 @@ export const createCourtService = async (admin, body, file) => {
 export const getCourtsService = async (user) => {
     let whereClause = {};
 
-    console.log('🔍 === DEBUG GET COURTS ===');
+    console.log('=== DEBUG GET COURTS ===');
     console.log('Usuario recibido:', user);
 
-    // 👇 SOLUCIÓN: Manejar ambos nombres de campo
     const userMallId = user.idMall !== undefined ? user.idMall : user.mallId;
 
-    console.log('🔄 Mall ID detectado:', userMallId);
+    console.log('Mall ID detectado:', userMallId);
 
     if (user.idRol === 2) {
         if (userMallId === undefined || userMallId === null) {
-            console.error('❌ ERROR: Administrador sin centro comercial');
+            console.error('ERROR: Administrador sin centro comercial');
             console.log('User object:', JSON.stringify(user, null, 2));
             throw new Error("El administrador no tiene un centro comercial asociado");
         }
         whereClause = { mallId: userMallId };
-        console.log('✅ Filtro aplicado: mallId =', userMallId);
+        console.log('Filtro aplicado: mallId =', userMallId);
     } else if (user.idRol !== 1) {
         throw new Error("No tienes permisos para ver las canchas.");
     }

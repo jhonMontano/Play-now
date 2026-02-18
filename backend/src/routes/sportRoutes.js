@@ -215,7 +215,6 @@
  *         description: No autorizado
  */
 
-
 import express from "express";
 import {
   createSport,
