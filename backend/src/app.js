@@ -10,6 +10,8 @@ import setupSwagger from "./config/swagger.js";
 import sporRoutes from "./routes/sportRoutes.js";
 import adminStatsRoutes from "./routes/adminStatsRoutes.js";
 import roleRoutes from "./routes/roleRoutes.js";
+import dashboardRoutes from "./routes/dashboardRoutes.js"
+
 const app = express();
 
 app.use(
@@ -36,5 +38,6 @@ app.use("/api/reservations", reservationRoutes);
 app.use("/api/sports", sporRoutes);
 app.use("/api/admin/stats", adminStatsRoutes);
 app.use("/api/roles", roleRoutes);
+app.use("/api/admin/dashboard", dashboardRoutes);
 
 export default app;
