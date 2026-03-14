@@ -11,6 +11,7 @@ const Mall = sequelize.define("Mall", {
   nombreCentro: {
     type: DataTypes.STRING,
     allowNull: false,
+    unique: true
   },
   direccion: {
     type: DataTypes.STRING,
