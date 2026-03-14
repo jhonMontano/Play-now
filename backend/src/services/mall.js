@@ -2,6 +2,7 @@ import Mall from "../models/mall.js";
 import User from "../models/user.js";
 import Roles from "../models/roles.js";
 import Court from "../models/court.js";
+import { Op, fn, col, where } from "sequelize";
 
 const capitalizeWords = (str) => str.replace(/\b\w/g, (c) => c.toUpperCase());
 
@@ -15,12 +16,17 @@ export const createMallAndAdminService = async (creatorUser, mallData, adminData
   }
 
   const existingMall = await Mall.findOne({
-    where: { nombreCentro: mallData.nombreCentro.toLowerCase() },
+    where: where(
+      fn("LOWER", col("nombreCentro")),
+      fn("LOWER", mallData.nombreCentro)
+    ),
   });
+
   if (existingMall)
     throw new Error(`Ya existe un centro comercial con el nombre "${capitalizeWords(existingMall.nombreCentro)}".`);
 
   const existingAdmin = await User.findOne({ where: { correo: adminData.correo } });
+
   if (existingAdmin) {
     if (existingAdmin.idMall) {
       const assignedMall = await Mall.findByPk(existingAdmin.idMall);
@@ -30,6 +36,16 @@ export const createMallAndAdminService = async (creatorUser, mallData, adminData
       throw new Error(`El usuario ${adminData.correo} ya es administrador del centro comercial "${mallName}"`);
     }
     throw new Error(`El usuario ${adminData.correo} ya existe y no puede ser reasignado`);
+  }
+
+  const existingDocument = await User.findOne({
+    where: { numeroDocumento: adminData.numeroDocumento }
+  });
+
+  if (existingDocument) {
+    throw new Error(
+      `Ya existe un usuario con el número de documento ${adminData.numeroDocumento}`
+    );
   }
 
   const newMall = await Mall.create({
