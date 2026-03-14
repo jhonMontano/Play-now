@@ -6,6 +6,8 @@ import { Op, fn, col, where } from "sequelize";
 
 const capitalizeWords = (str) => str.replace(/\b\w/g, (c) => c.toUpperCase());
 
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export const createMallAndAdminService = async (creatorUser, mallData, adminData) => {
   if (creatorUser.idRol !== 1)
     throw new Error("Acceso denegado. Solo el super administrador puede crear centros comerciales.");
@@ -46,6 +48,10 @@ export const createMallAndAdminService = async (creatorUser, mallData, adminData
     throw new Error(
       `Ya existe un usuario con el número de documento ${adminData.numeroDocumento}`
     );
+  }
+
+  if (!emailRegex.test(adminData.correo)) {
+    throw new Error("El correo electrónico no tiene un formato válido");
   }
 
   const newMall = await Mall.create({
