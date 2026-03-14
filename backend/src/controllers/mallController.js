@@ -9,14 +9,37 @@ import {
 export const createMallAndAdmin = async (req, res) => {
   try {
     const { mall, admin } = req.body;
-    const { newMall, newAdmin } = await createMallAndAdminService(req.user, mall, admin);
+
+    const { newMall, newAdmin } = await createMallAndAdminService(
+      req.user,
+      mall,
+      admin
+    );
+
     res.status(201).json({
       message: "Centro comercial y administrador creados correctamente",
       mall: newMall,
       administrador: newAdmin,
     });
+
   } catch (error) {
-    res.status(400).json({ message: error.message });
+
+    console.log("ERROR COMPLETO:");
+    console.log(error);
+
+    if (error.errors) {
+      console.log("ERRORES DE SEQUELIZE:");
+      error.errors.forEach(e => {
+        console.log("Campo:", e.path);
+        console.log("Mensaje:", e.message);
+        console.log("Valor:", e.value);
+      });
+    }
+
+    res.status(400).json({
+      message: error.message,
+      details: error.errors
+    });
   }
 };
 
