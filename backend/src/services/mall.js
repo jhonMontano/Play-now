@@ -59,6 +59,7 @@ export const createMallAndAdminService = async (creatorUser, mallData, adminData
     direccion: mallData.direccion,
     telefono: mallData.telefono,
     ciudad: mallData.ciudad,
+    activo: true
   });
 
   const rolAdmin = await Roles.findOne({ where: { nombre: "admin" } });
@@ -78,6 +79,56 @@ export const createMallAndAdminService = async (creatorUser, mallData, adminData
 
 export const getAllMallsService = async () => {
   return await Mall.findAll({
+    where: { activo: true },
+    include: {
+      model: User,
+      as: "administrador",
+      attributes: [
+        "id",
+        "primerNombre",
+        "segundoNombre",
+        "primerApellido",
+        "segundoApellido",
+        "correo",
+        "celular",
+        "idRol",
+        "activo",
+        "numeroDocumento",
+        "tipoDocumento",
+        "direccion",
+      ],
+    },
+    order: [["nombreCentro", "ASC"]],
+  });
+};
+
+export const getAllMallsIncludingInactiveService = async () => {
+  return await Mall.findAll({
+    include: {
+      model: User,
+      as: "administrador",
+      attributes: [
+        "id",
+        "primerNombre",
+        "segundoNombre",
+        "primerApellido",
+        "segundoApellido",
+        "correo",
+        "celular",
+        "idRol",
+        "activo",
+        "numeroDocumento",
+        "tipoDocumento",
+        "direccion",
+      ],
+    },
+    order: [["activo", "DESC"], ["nombreCentro", "ASC"]],
+  });
+};
+
+export const getAllInactiveMallsService = async () => {
+  return await Mall.findAll({
+    where: { activo: false },
     include: {
       model: User,
       as: "administrador",
@@ -135,11 +186,12 @@ export const updateMallService = async (user, id, data) => {
   const { mall, admin } = data;
 
   if (mall) {
-    const allowedMallFields = ["nombreCentro", "direccion", "telefono", "ciudad"];
+    const { activo, ...allowedMallFields } = mall;
     const mallData = {};
 
-    for (const field of allowedMallFields) {
-      if (mall.hasOwnProperty(field)) mallData[field] = mall[field];
+    const validFields = ["nombreCentro", "direccion", "telefono", "ciudad"];
+    for (const field of validFields) {
+      if (allowedMallFields.hasOwnProperty(field)) mallData[field] = allowedMallFields[field];
     }
 
     await existingMall.update(mallData);
@@ -184,6 +236,27 @@ export const updateMallService = async (user, id, data) => {
       ],
     },
   });
+};
+
+export const updateMallStatusService = async (user, id, activo) => {
+  if (user.idRol !== 1)
+    throw new Error("Acceso denegado. Solo el super administrador puede modificar el estado de centros comerciales");
+
+  const mall = await Mall.findByPk(id);
+  if (!mall) throw new Error("Centro comercial no encontrado");
+
+  if (mall.activo === activo) {
+    const estado = activo ? 'activo' : 'inactivo';
+    throw new Error(`El centro comercial ya está ${estado}`);
+  }
+
+  await mall.update({ activo });
+  return mall;
+};
+
+export const hasCourtsAssociatedService = async (mallId) => {
+  const count = await Court.count({ where: { mallId } });
+  return count > 0;
 };
 
 export const deleteMallService = async (user, id) => {

@@ -401,22 +401,134 @@
  *         description: Centro comercial no encontrado
  */
 
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Mall:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: integer
+ *         nombreCentro:
+ *           type: string
+ *         direccion:
+ *           type: string
+ *         telefono:
+ *           type: string
+ *         ciudad:
+ *           type: string
+ *         activo:
+ *           type: boolean
+ *           description: Estado del centro comercial (true=activo, false=inactivo)
+ *           example: true
+ *         createdAt:
+ *           type: string
+ *           format: date-time
+ *         updatedAt:
+ *           type: string
+ *           format: date-time
+ *         administrador:
+ *           $ref: '#/components/schemas/User'
+ */
+
+/**
+ * @swagger
+ * /api/malls/{id}/status:
+ *   patch:
+ *     summary: Activar o desactivar un centro comercial
+ *     description: Solo accesible para super administradores (idRol = 1)
+ *     tags: [Malls]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - activo
+ *             properties:
+ *               activo:
+ *                 type: boolean
+ *                 example: false
+ *     responses:
+ *       200:
+ *         description: Estado actualizado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 mall:
+ *                   $ref: '#/components/schemas/Mall'
+ *                 action:
+ *                   type: string
+ *       400:
+ *         description: Error en la solicitud
+ *       403:
+ *         description: Acceso denegado
+ */
+
+/**
+ * @swagger
+ * /api/malls/admin/all:
+ *   get:
+ *     summary: Obtener todos los centros comerciales (incluyendo inactivos)
+ *     description: Solo accesible para super administradores
+ *     tags: [Malls]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Lista completa de centros comerciales
+ */
+
+/**
+ * @swagger
+ * /api/malls/admin/inactive:
+ *   get:
+ *     summary: Obtener solo centros comerciales inactivos
+ *     description: Solo accesible para super administradores
+ *     tags: [Malls]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Lista de centros comerciales inactivos
+ */
+
 import express from "express";
 import { authenticateToken } from "../middlewares/authMiddleware.js";
 import {
   createMallAndAdmin,
   getAllMalls,
+  getAllMallsIncludingInactive,
+  getInactiveMalls,
   getMallById,
   updateMall,
+  updateMallStatus,
   deleteMall,
 } from "../controllers/mallController.js";
 
 const router = express.Router();
 
-router.post("/", authenticateToken, createMallAndAdmin);
 router.get("/", authenticateToken, getAllMalls);
 router.get("/:id", authenticateToken, getMallById);
+router.post("/", authenticateToken, createMallAndAdmin);
+router.get("/admin/all", authenticateToken, getAllMallsIncludingInactive);
+router.get("/admin/inactive", authenticateToken, getInactiveMalls);
 router.put("/:id", authenticateToken, updateMall);
+router.patch("/:id/status", authenticateToken, updateMallStatus);
 router.delete("/:id", authenticateToken, deleteMall);
 
 export default router;

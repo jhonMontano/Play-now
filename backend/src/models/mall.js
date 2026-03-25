@@ -1,6 +1,5 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../config/database.js";
-import User from "./user.js";
 
 const Mall = sequelize.define("Mall", {
   id: {
@@ -25,6 +24,13 @@ const Mall = sequelize.define("Mall", {
     type: DataTypes.STRING,
     allowNull: false,
   },
+  activo: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: true,
+    allowNull: false
+  }
+}, {
+  timestamps: true
 });
 
 export default Mall;
