@@ -1,8 +1,11 @@
 import {
   createMallAndAdminService,
   getAllMallsService,
+  getAllMallsIncludingInactiveService,
+  getAllInactiveMallsService,
   getMallByIdService,
   updateMallService,
+  updateMallStatusService,
   deleteMallService,
 } from "../services/mall.js";
 
@@ -23,7 +26,6 @@ export const createMallAndAdmin = async (req, res) => {
     });
 
   } catch (error) {
-
     console.log("ERROR COMPLETO:");
     console.log(error);
 
@@ -52,6 +54,30 @@ export const getAllMalls = async (req, res) => {
   }
 };
 
+export const getAllMallsIncludingInactive = async (req, res) => {
+  try {
+    if (req.user.idRol !== 1) {
+      return res.status(403).json({ message: "Acceso denegado. Solo super administradores" });
+    }
+    const malls = await getAllMallsIncludingInactiveService();
+    res.json(malls);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getInactiveMalls = async (req, res) => {
+  try {
+    if (req.user.idRol !== 1) {
+      return res.status(403).json({ message: "Acceso denegado. Solo super administradores" });
+    }
+    const malls = await getAllInactiveMallsService();
+    res.json(malls);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 export const getMallById = async (req, res) => {
   try {
     const mall = await getMallByIdService(req.params.id);
@@ -67,6 +93,39 @@ export const updateMall = async (req, res) => {
     res.json({
       message: "Centro comercial y administrador actualizados correctamente",
       mall: updatedMall,
+    });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+export const updateMallStatus = async (req, res) => {
+  try {
+    const { activo } = req.body;
+    
+    if (activo === undefined) {
+      return res.status(400).json({ 
+        message: "El campo 'activo' es requerido. Use true para activar o false para desactivar.",
+        example: { activo: true }
+      });
+    }
+    
+    if (typeof activo !== 'boolean') {
+      return res.status(400).json({ 
+        message: "El campo 'activo' debe ser un valor booleano (true/false)"
+      });
+    }
+    
+    const mall = await updateMallStatusService(req.user, req.params.id, activo);
+    
+    const mensaje = activo 
+      ? "Centro comercial activado correctamente. Ya está disponible para reservas."
+      : "Centro comercial desactivado correctamente. No estará disponible para nuevas reservas, pero las existentes siguen vigentes.";
+    
+    res.json({
+      message: mensaje,
+      mall,
+      action: activo ? "activated" : "deactivated"
     });
   } catch (error) {
     res.status(400).json({ message: error.message });
