@@ -12,18 +12,18 @@
  *         nombre:
  *           type: string
  *           description: Nombre del deporte
- *           example: Fútbol
+ *           example: Fútbol 7
  *         descripcion:
  *           type: string
  *           description: Descripción del deporte
- *           example: Deporte de equipo jugado con balón
+ *           example: Fútbol 7, 7 jugadores por equipo
  *         cantidad:
  *           type: integer
- *           description: Cantidad de jugadores permitidos
- *           example: 11
+ *           description: Cantidad de jugadores permitidos (ambos equipos)
+ *           example: 14
  *         activo:
  *           type: boolean
- *           description: Indica si el deporte está activo (para eliminación lógica)
+ *           description: Estado del deporte (true=activo, false=inactivo)
  *           example: true
  *         createdAt:
  *           type: string
@@ -42,20 +42,39 @@
  *       properties:
  *         nombre:
  *           type: string
- *           description: Nombre del deporte (único)
- *           example: Baloncesto
+ *           description: Nombre del deporte (debe ser único)
+ *           example: Fútbol 7
  *         descripcion:
  *           type: string
  *           description: Descripción detallada del deporte
- *           example: Deporte jugado con balón y canastas
+ *           example: Fútbol 7, 7 jugadores por equipo
  *         cantidad:
  *           type: integer
- *           description: Cantidad de jugadores por equipo
- *           example: 5
+ *           description: Cantidad total de jugadores (ambos equipos)
+ *           example: 14
+ *
+ *     SportStatusUpdateRequest:
+ *       type: object
+ *       required:
+ *         - activo
+ *       properties:
  *         activo:
  *           type: boolean
- *           description: Estado del deporte (opcional, por defecto true)
- *           example: true
+ *           description: true para activar, false para desactivar
+ *           example: false
+ *
+ *     SportStatusUpdateResponse:
+ *       type: object
+ *       properties:
+ *         message:
+ *           type: string
+ *           example: Deporte desactivado correctamente. No estará disponible para nuevas canchas.
+ *         sport:
+ *           $ref: '#/components/schemas/Sport'
+ *         action:
+ *           type: string
+ *           enum: [activated, deactivated]
+ *           example: deactivated
  *
  *     SportResponse:
  *       type: object
@@ -80,7 +99,10 @@
  *       properties:
  *         message:
  *           type: string
- *           example: Deporte desactivado correctamente
+ *           example: Deporte eliminado permanentemente
+ *         action:
+ *           type: string
+ *           example: deleted
  *
  *     ErrorResponse:
  *       type: object
@@ -88,6 +110,13 @@
  *         message:
  *           type: string
  *           example: Error message
+ *         allowed_endpoints:
+ *           type: object
+ *           properties:
+ *             activate:
+ *               type: string
+ *             deactivate:
+ *               type: string
  *
  *   securitySchemes:
  *     bearerAuth:
@@ -113,7 +142,8 @@
  *       
  *       - El nombre del deporte es obligatorio y debe ser único
  *       - La cantidad de jugadores es obligatoria
- *       - El campo 'activo' es opcional (por defecto true)
+ *       - El deporte se crea con activo=true por defecto
+ *       - No se puede enviar el campo 'activo' en la creación (se asigna automáticamente)
  *     tags: [Sports]
  *     security:
  *       - bearerAuth: []
@@ -122,18 +152,31 @@
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/SportInput'
+ *             type: object
+ *             required:
+ *               - nombre
+ *               - cantidad
+ *             properties:
+ *               nombre:
+ *                 type: string
+ *                 example: Fútbol 7
+ *               descripcion:
+ *                 type: string
+ *                 example: Fútbol 7, 7 jugadores por equipo
+ *               cantidad:
+ *                 type: integer
+ *                 example: 14
  *           examples:
- *             deporteCompleto:
+ *             deporteFutbol7:
  *               value:
- *                 nombre: Tenis
- *                 descripcion: Deporte individual o en parejas
- *                 cantidad: 2
- *                 activo: true
- *             deporteBasico:
+ *                 nombre: Fútbol 7
+ *                 descripcion: Fútbol 7, 7 jugadores por equipo
+ *                 cantidad: 14
+ *             deportePadel:
  *               value:
- *                 nombre: Natación
- *                 cantidad: 1
+ *                 nombre: Pádel
+ *                 descripcion: Pádel, 2 o 4 jugadores
+ *                 cantidad: 4
  *     responses:
  *       201:
  *         description: Deporte creado exitosamente
@@ -150,7 +193,7 @@
  *             examples:
  *               nombreDuplicado:
  *                 value:
- *                   message: "El deporte 'Tenis' ya existe"
+ *                   message: "El nombre del deporte ya existe"
  *               campoObligatorio:
  *                 value:
  *                   message: "El nombre del deporte es obligatorio"
@@ -159,28 +202,12 @@
  *                   message: "La cantidad de jugadores es obligatoria"
  *       401:
  *         description: No autorizado - Token no proporcionado o inválido
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
- *             example:
- *               message: "Token no proporcionado"
  *       500:
  *         description: Error del servidor
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
- *             example:
- *               message: "Error interno del servidor"
- */
-
-/**
- * @swagger
- * /api/sports:
+ *
  *   get:
  *     summary: Obtener todos los deportes activos
- *     description: Retorna la lista completa de deportes con activo = true
+ *     description: Retorna la lista completa de deportes con activo = true. Este es el endpoint principal para el frontend.
  *     tags: [Sports]
  *     security:
  *       - bearerAuth: []
@@ -193,14 +220,85 @@
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/Sport'
+ *             examples:
+ *               deportesActivos:
+ *                 value:
+ *                   - id: 1
+ *                     nombre: Fútbol 5
+ *                     descripcion: Fútbol sala, 5 jugadores por equipo
+ *                     cantidad: 10
+ *                     activo: true
+ *                   - id: 2
+ *                     nombre: Fútbol 7
+ *                     descripcion: Fútbol 7, 7 jugadores por equipo
+ *                     cantidad: 14
+ *                     activo: true
  *       401:
  *         description: No autorizado
+ *       500:
+ *         description: Error del servidor
+ */
+
+/**
+ * @swagger
+ * /api/sports/inactive/all:
+ *   get:
+ *     summary: Obtener todos los deportes inactivos
+ *     description: |
+ *       **Requiere autenticación**
+ *       
+ *       - Retorna la lista de deportes que han sido desactivados (activo = false)
+ *       - Útil para administradores que quieran reactivar deportes
+ *     tags: [Sports]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Lista de deportes inactivos
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Sport'
+ *       401:
+ *         description: No autorizado
+ *       500:
+ *         description: Error del servidor
+ */
+
+/**
+ * @swagger
+ * /api/sports/inactive/{id}:
+ *   get:
+ *     summary: Obtener un deporte inactivo por ID
+ *     description: Retorna los detalles de un deporte inactivo específico
+ *     tags: [Sports]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *         description: ID del deporte inactivo
+ *     responses:
+ *       200:
+ *         description: Deporte inactivo encontrado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Sport'
+ *       404:
+ *         description: Deporte inactivo no encontrado
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
- *       500:
- *         description: Error del servidor
+ *       401:
+ *         description: No autorizado
  */
 
 /**
@@ -208,7 +306,7 @@
  * /api/sports/{id}:
  *   get:
  *     summary: Obtener un deporte específico por ID
- *     description: Retorna un deporte específico incluyendo su estado activo/inactivo
+ *     description: Retorna un deporte específico, incluyendo su estado activo/inactivo
  *     tags: [Sports]
  *     security:
  *       - bearerAuth: []
@@ -236,23 +334,15 @@
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
- *             example:
- *               message: "Deporte con ID 1 no encontrado"
- *       500:
- *         description: Error del servidor
- */
-
-/**
- * @swagger
- * /api/sports/{id}:
+ *
  *   put:
  *     summary: Actualizar un deporte existente
  *     description: |
  *       **Requiere autenticación**
  *       
- *       - Todos los campos son opcionales en la actualización
- *       - El nombre no puede duplicarse si se modifica
- *       - Se puede modificar el estado 'activo' para reactivar deportes
+ *       - Permite actualizar nombre, descripción y cantidad de jugadores
+ *       - **NO permite modificar el campo 'activo' directamente**
+ *       - Para activar/desactivar use el endpoint PATCH /api/sports/{id}/status
  *     tags: [Sports]
  *     security:
  *       - bearerAuth: []
@@ -264,21 +354,31 @@
  *           type: integer
  *           minimum: 1
  *         description: ID del deporte a actualizar
- *         example: 1
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/SportInput'
+ *             type: object
+ *             properties:
+ *               nombre:
+ *                 type: string
+ *                 example: Fútbol Sala
+ *               descripcion:
+ *                 type: string
+ *                 example: Fútbol sala profesional
+ *               cantidad:
+ *                 type: integer
+ *                 example: 10
  *           examples:
- *             actualizacionParcial:
+ *             actualizarNombre:
  *               value:
  *                 nombre: Fútbol Sala
- *                 cantidad: 5
- *             reactivar:
+ *             actualizarTodo:
  *               value:
- *                 activo: true
+ *                 nombre: Fútbol Sala
+ *                 descripcion: Fútbol sala profesional
+ *                 cantidad: 10
  *     responses:
  *       200:
  *         description: Deporte actualizado correctamente
@@ -292,21 +392,21 @@
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
+ *             examples:
+ *               campoActivo:
+ *                 value:
+ *                   message: "No se puede modificar el estado del deporte. Use los endpoints /activate o /deactivate"
+ *                   allowed_endpoints:
+ *                     activate: "/api/sports/1/activate"
+ *                     deactivate: "/api/sports/1/deactivate"
+ *               nombreDuplicado:
+ *                 value:
+ *                   message: "El nombre del deporte ya existe"
  *       401:
  *         description: No autorizado
  *       404:
  *         description: Deporte no encontrado
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
- *       500:
- *         description: Error del servidor
- */
-
-/**
- * @swagger
- * /api/sports/{id}:
+ *
  *   delete:
  *     summary: Eliminar físicamente un deporte
  *     description: |
@@ -314,7 +414,8 @@
  *       
  *       - Elimina permanentemente el deporte de la base de datos
  *       - **Solo funciona si el deporte NO tiene canchas asociadas**
- *       - Si tiene canchas, devuelve error 400 con instrucciones
+ *       - Si tiene canchas asociadas, devuelve error 400 con instrucciones
+ *       - Para deportes con canchas, use PATCH /api/sports/{id}/status con activo=false
  *     tags: [Sports]
  *     security:
  *       - bearerAuth: []
@@ -331,14 +432,7 @@
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Deporte eliminado permanentemente
- *                 action:
- *                   type: string
- *                   example: deleted
+ *               $ref: '#/components/schemas/SportDeleteResponse'
  *       400:
  *         description: No se puede eliminar porque tiene canchas asociadas
  *         content:
@@ -350,86 +444,30 @@
  *                   type: string
  *                 action:
  *                   type: string
- *                 endpoint:
- *                   type: string
+ *                 options:
+ *                   type: object
+ *                   properties:
+ *                     deactivate:
+ *                       type: string
+ *                     view_courts:
+ *                       type: string
  *       404:
  *         description: Deporte no encontrado
- */
-
-/**
- * @swagger
- * /api/sports/{id}/deactivate:
- *   put:
- *     summary: Desactivar un deporte (eliminación lógica)
- *     description: |
- *       **Requiere autenticación**
- *       
- *       - Desactiva el deporte (cambia activo a false)
- *       - El deporte no se elimina físicamente
- *       - No estará disponible para nuevas canchas
- *       - Las canchas existentes siguen funcionando
- *     tags: [Sports]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *         description: ID del deporte a desactivar
- *     responses:
- *       200:
- *         description: Deporte desactivado correctamente
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Deporte desactivado correctamente
- *                 sport:
- *                   $ref: '#/components/schemas/Sport'
- *                 action:
- *                   type: string
- *                   example: deactivated
- *       400:
- *         description: El deporte ya está desactivado
- *       404:
- *         description: Deporte no encontrado
- */
-
-/**
- * @swagger
- * /api/sports/inactive/all:
- *   get:
- *     summary: Obtener todos los deportes inactivos
- *     description: Retorna la lista de deportes que han sido desactivados
- *     tags: [Sports]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: Lista de deportes inactivos
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Sport'
  */
 
 /**
  * @swagger
  * /api/sports/{id}/status:
  *   patch:
- *     summary: Activar o desactivar un deporte
+ *     summary: Activar o desactivar un deporte (endpoint unificado)
  *     description: |
  *       **Requiere autenticación**
  *       
- *       - Permite activar o desactivar un deporte en un solo endpoint
+ *       - Endpoint único para activar o desactivar deportes
  *       - Envía `activo: true` para activar, `activo: false` para desactivar
+ *       - Esta es la forma correcta de cambiar el estado de un deporte
+ *       - Los deportes inactivos no aparecen en el listado principal
+ *       - Las canchas existentes con deportes inactivos siguen funcionando
  *     tags: [Sports]
  *     security:
  *       - bearerAuth: []
@@ -445,14 +483,7 @@
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             required:
- *               - activo
- *             properties:
- *               activo:
- *                 type: boolean
- *                 description: true para activar, false para desactivar
- *                 example: false
+ *             $ref: '#/components/schemas/SportStatusUpdateRequest'
  *           examples:
  *             desactivar:
  *               value:
@@ -466,19 +497,13 @@
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                 sport:
- *                   $ref: '#/components/schemas/Sport'
- *                 action:
- *                   type: string
- *                   enum: [activated, deactivated]
+ *               $ref: '#/components/schemas/SportStatusUpdateResponse'
  *       400:
  *         description: Error de validación
  *         content:
  *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *             examples:
  *               campoFaltante:
  *                 value:
@@ -494,6 +519,8 @@
  *                   message: "El deporte ya está inactivo"
  *       404:
  *         description: Deporte no encontrado
+ *       401:
+ *         description: No autorizado
  */
 
 import express from "express";

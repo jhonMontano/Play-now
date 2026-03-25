@@ -4,39 +4,45 @@
  *   schemas:
  *     Mall:
  *       type: object
- *       required:
- *         - nombreCentro
- *         - direccion
- *         - telefono
- *         - ciudad
  *       properties:
  *         id:
  *           type: integer
  *           description: ID auto-generado del centro comercial
+ *           example: 110
  *         nombreCentro:
  *           type: string
  *           description: Nombre del centro comercial
- *           example: "Centro Mayor"
+ *           example: "Florida"
  *         direccion:
  *           type: string
  *           description: Dirección física del centro comercial
- *           example: "Calle 123 #45-67"
+ *           example: "Cra 48 #32B-60"
  *         telefono:
  *           type: string
  *           description: Teléfono de contacto
- *           example: "+57 601 1234567"
+ *           example: "6041234567"
  *         ciudad:
  *           type: string
  *           description: Ciudad donde se encuentra el centro comercial
- *           example: "Bogotá"
+ *           example: "Medellín"
+ *         activo:
+ *           type: boolean
+ *           description: Estado del centro comercial (true=activo, false=inactivo)
+ *           example: true
  *         createdAt:
  *           type: string
  *           format: date-time
  *           description: Fecha de creación
+ *           example: "2026-03-14T19:43:27.703Z"
  *         updatedAt:
  *           type: string
  *           format: date-time
- *           description: Fecha de actualización
+ *           description: Fecha de última actualización
+ *           example: "2026-03-14T19:43:27.821Z"
+ *         adminId:
+ *           type: integer
+ *           description: ID del administrador del centro
+ *           example: 52
  *         administrador:
  *           $ref: '#/components/schemas/User'
  * 
@@ -50,15 +56,19 @@
  *       properties:
  *         nombreCentro:
  *           type: string
+ *           description: Nombre del centro comercial
  *           example: "Plaza Central"
  *         direccion:
  *           type: string
+ *           description: Dirección física
  *           example: "Avenida Principal 123"
  *         telefono:
  *           type: string
+ *           description: Teléfono de contacto
  *           example: "+57 601 7654321"
  *         ciudad:
  *           type: string
+ *           description: Ciudad
  *           example: "Medellín"
  * 
  *     AdminInput:
@@ -75,34 +85,44 @@
  *         tipoDocumento:
  *           type: string
  *           enum: [CC, NIT]
+ *           description: Tipo de documento de identidad
  *           example: "CC"
  *         numeroDocumento:
  *           type: string
+ *           description: Número de documento
  *           example: "123456789"
  *         primerNombre:
  *           type: string
+ *           description: Primer nombre
  *           example: "Carlos"
  *         segundoNombre:
  *           type: string
+ *           description: Segundo nombre (opcional)
  *           example: "Andrés"
  *         primerApellido:
  *           type: string
+ *           description: Primer apellido
  *           example: "Gómez"
  *         segundoApellido:
  *           type: string
+ *           description: Segundo apellido (opcional)
  *           example: "López"
  *         razonSocial:
  *           type: string
+ *           description: Razón social (para empresas)
  *           example: "Empresa XYZ SAS"
  *         correo:
  *           type: string
  *           format: email
+ *           description: Correo electrónico
  *           example: "admin@plazacentral.com"
  *         celular:
  *           type: string
+ *           description: Número de celular
  *           example: "3001234567"
  *         direccion:
  *           type: string
+ *           description: Dirección de residencia
  *           example: "Carrera 45 #26-89"
  * 
  *     CreateMallRequest:
@@ -129,10 +149,34 @@
  *       properties:
  *         message:
  *           type: string
+ *           example: "Centro comercial y administrador creados correctamente"
  *         mall:
  *           $ref: '#/components/schemas/Mall'
  *         administrador:
  *           $ref: '#/components/schemas/User'
+ * 
+ *     MallStatusUpdateRequest:
+ *       type: object
+ *       required:
+ *         - activo
+ *       properties:
+ *         activo:
+ *           type: boolean
+ *           description: true para activar, false para desactivar
+ *           example: false
+ * 
+ *     MallStatusUpdateResponse:
+ *       type: object
+ *       properties:
+ *         message:
+ *           type: string
+ *           example: "Centro comercial desactivado correctamente. No estará disponible para nuevas reservas, pero las existentes siguen vigentes."
+ *         mall:
+ *           $ref: '#/components/schemas/Mall'
+ *         action:
+ *           type: string
+ *           enum: [activated, deactivated]
+ *           example: "deactivated"
  * 
  *   securitySchemes:
  *     bearerAuth:
@@ -153,7 +197,7 @@
  * /api/malls:
  *   post:
  *     summary: Crear un nuevo centro comercial y su administrador
- *     description: Solo accesible para super administradores (idRol = 1)
+ *     description: Solo accesible para super administradores (idRol = 1). El centro comercial se crea con activo=true por defecto.
  *     tags: [Malls]
  *     security:
  *       - bearerAuth: []
@@ -214,14 +258,10 @@
  *         description: No autorizado - Token inválido
  *       500:
  *         description: Error del servidor
- */
-
-/**
- * @swagger
- * /api/malls:
+ *
  *   get:
- *     summary: Obtener lista de todos los centros comerciales
- *     description: Incluye la información del administrador de cada centro
+ *     summary: Obtener lista de centros comerciales activos
+ *     description: Retorna solo los centros comerciales con activo=true. Incluye la información del administrador.
  *     tags: [Malls]
  *     security:
  *       - bearerAuth: []
@@ -241,13 +281,30 @@
  *         description: Límite de resultados por página
  *     responses:
  *       200:
- *         description: Lista de centros comerciales obtenida exitosamente
+ *         description: Lista de centros comerciales activos
  *         content:
  *           application/json:
  *             schema:
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/Mall'
+ *             examples:
+ *               ejemplo:
+ *                 value:
+ *                   - id: 110
+ *                     nombreCentro: "Florida"
+ *                     direccion: "Cra 48 #32B-60"
+ *                     telefono: "6041234567"
+ *                     ciudad: "Medellin"
+ *                     activo: true
+ *                     createdAt: "2026-03-14T19:43:27.703Z"
+ *                     updatedAt: "2026-03-14T19:43:27.821Z"
+ *                     adminId: 52
+ *                     administrador:
+ *                       id: 52
+ *                       primerNombre: "Carlos"
+ *                       primerApellido: "Ramírez"
+ *                       correo: "juan.ramirez@viva.com"
  *       401:
  *         description: No autorizado
  *       500:
@@ -259,6 +316,7 @@
  * /api/malls/{id}:
  *   get:
  *     summary: Obtener un centro comercial por ID
+ *     description: Retorna los detalles de un centro comercial específico
  *     tags: [Malls]
  *     security:
  *       - bearerAuth: []
@@ -269,6 +327,7 @@
  *         schema:
  *           type: integer
  *         description: ID del centro comercial
+ *         example: 110
  *     responses:
  *       200:
  *         description: Centro comercial encontrado
@@ -288,14 +347,10 @@
  *                 message:
  *                   type: string
  *                   example: "Centro comercial no encontrado"
- */
-
-/**
- * @swagger
- * /api/malls/{id}:
+ *
  *   put:
  *     summary: Actualizar un centro comercial y su administrador
- *     description: Solo accesible para super administradores (idRol = 1)
+ *     description: Solo accesible para super administradores (idRol = 1). No permite modificar el campo 'activo' directamente.
  *     tags: [Malls]
  *     security:
  *       - bearerAuth: []
@@ -350,14 +405,10 @@
  *         description: No autorizado
  *       404:
  *         description: Centro comercial no encontrado
- */
-
-/**
- * @swagger
- * /api/malls/{id}:
+ *
  *   delete:
  *     summary: Eliminar un centro comercial y su administrador
- *     description: Solo accesible para super administradores (idRol = 1). Elimina tanto el centro comercial como el usuario administrador asociado.
+ *     description: Solo accesible para super administradores (idRol = 1). Elimina tanto el centro comercial como el usuario administrador asociado. Solo permite eliminación física si no tiene canchas asociadas.
  *     tags: [Malls]
  *     security:
  *       - bearerAuth: []
@@ -395,6 +446,9 @@
  *               noEncontrado:
  *                 value:
  *                   message: "Centro comercial no encontrado"
+ *               tieneCanchas:
+ *                 value:
+ *                   message: "No se puede eliminar el centro comercial porque tiene canchas asociadas. Elimina o reasigna las canchas antes de continuar."
  *       401:
  *         description: No autorizado
  *       404:
@@ -403,33 +457,50 @@
 
 /**
  * @swagger
- * components:
- *   schemas:
- *     Mall:
- *       type: object
- *       properties:
- *         id:
- *           type: integer
- *         nombreCentro:
- *           type: string
- *         direccion:
- *           type: string
- *         telefono:
- *           type: string
- *         ciudad:
- *           type: string
- *         activo:
- *           type: boolean
- *           description: Estado del centro comercial (true=activo, false=inactivo)
- *           example: true
- *         createdAt:
- *           type: string
- *           format: date-time
- *         updatedAt:
- *           type: string
- *           format: date-time
- *         administrador:
- *           $ref: '#/components/schemas/User'
+ * /api/malls/admin/all:
+ *   get:
+ *     summary: Obtener todos los centros comerciales (incluyendo inactivos)
+ *     description: Solo accesible para super administradores. Retorna la lista completa de centros comerciales, tanto activos como inactivos.
+ *     tags: [Malls]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Lista completa de centros comerciales
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Mall'
+ *       403:
+ *         description: Acceso denegado - Solo super administradores
+ *       401:
+ *         description: No autorizado
+ */
+
+/**
+ * @swagger
+ * /api/malls/admin/inactive:
+ *   get:
+ *     summary: Obtener solo centros comerciales inactivos
+ *     description: Solo accesible para super administradores. Retorna la lista de centros comerciales con activo=false.
+ *     tags: [Malls]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Lista de centros comerciales inactivos
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Mall'
+ *       403:
+ *         description: Acceso denegado - Solo super administradores
+ *       401:
+ *         description: No autorizado
  */
 
 /**
@@ -437,7 +508,13 @@
  * /api/malls/{id}/status:
  *   patch:
  *     summary: Activar o desactivar un centro comercial
- *     description: Solo accesible para super administradores (idRol = 1)
+ *     description: |
+ *       **Requiere autenticación y rol de super administrador**
+ *       
+ *       - Permite activar o desactivar un centro comercial
+ *       - Los centros inactivos no aparecen en el listado principal
+ *       - Las reservas existentes siguen siendo válidas
+ *       - No se pueden crear nuevas reservas en centros inactivos
  *     tags: [Malls]
  *     security:
  *       - bearerAuth: []
@@ -447,21 +524,30 @@
  *         required: true
  *         schema:
  *           type: integer
+ *         description: ID del centro comercial
+ *         example: 110
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             required:
- *               - activo
- *             properties:
- *               activo:
- *                 type: boolean
- *                 example: false
+ *             $ref: '#/components/schemas/MallStatusUpdateRequest'
+ *           examples:
+ *             desactivar:
+ *               value:
+ *                 activo: false
+ *             activar:
+ *               value:
+ *                 activo: true
  *     responses:
  *       200:
- *         description: Estado actualizado
+ *         description: Estado actualizado correctamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/MallStatusUpdateResponse'
+ *       400:
+ *         description: Error en la solicitud
  *         content:
  *           application/json:
  *             schema:
@@ -469,14 +555,33 @@
  *               properties:
  *                 message:
  *                   type: string
- *                 mall:
- *                   $ref: '#/components/schemas/Mall'
- *                 action:
- *                   type: string
- *       400:
- *         description: Error en la solicitud
+ *             examples:
+ *               campoRequerido:
+ *                 value:
+ *                   message: "El campo 'activo' es requerido. Use true para activar o false para desactivar."
+ *               tipoIncorrecto:
+ *                 value:
+ *                   message: "El campo 'activo' debe ser un valor booleano (true/false)"
+ *               yaActivo:
+ *                 value:
+ *                   message: "El centro comercial ya está activo"
+ *               yaInactivo:
+ *                 value:
+ *                   message: "El centro comercial ya está inactivo"
  *       403:
- *         description: Acceso denegado
+ *         description: Acceso denegado - Solo super administradores
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Acceso denegado. Solo el super administrador puede modificar el estado de centros comerciales"
+ *       404:
+ *         description: Centro comercial no encontrado
+ *       401:
+ *         description: No autorizado
  */
 
 /**
@@ -484,13 +589,23 @@
  * /api/malls/admin/all:
  *   get:
  *     summary: Obtener todos los centros comerciales (incluyendo inactivos)
- *     description: Solo accesible para super administradores
+ *     description: Solo accesible para super administradores. Retorna la lista completa de centros comerciales, tanto activos como inactivos.
  *     tags: [Malls]
  *     security:
  *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Lista completa de centros comerciales
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Mall'
+ *       403:
+ *         description: Acceso denegado - Solo super administradores
+ *       401:
+ *         description: No autorizado
  */
 
 /**
@@ -498,13 +613,23 @@
  * /api/malls/admin/inactive:
  *   get:
  *     summary: Obtener solo centros comerciales inactivos
- *     description: Solo accesible para super administradores
+ *     description: Solo accesible para super administradores. Retorna la lista de centros comerciales con activo=false.
  *     tags: [Malls]
  *     security:
  *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Lista de centros comerciales inactivos
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Mall'
+ *       403:
+ *         description: Acceso denegado - Solo super administradores
+ *       401:
+ *         description: No autorizado
  */
 
 import express from "express";
