@@ -355,6 +355,7 @@ import {
   getSportById,
   updateSport,
   deleteSport,
+  getInactiveSports
 } from "../controllers/sport.js";
 import { authenticateToken } from "../middlewares/authMiddleware.js";
 
@@ -365,6 +366,7 @@ router.get("/", authenticateToken, getSports);
 router.get("/:id", authenticateToken, getSportById);
 router.put("/:id", authenticateToken, updateSport);
 router.delete("/:id", authenticateToken, deleteSport);
+router.get("/inactive", authenticateToken, getInactiveSports);
 
 export default router;
 
