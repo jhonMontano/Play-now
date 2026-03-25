@@ -308,13 +308,13 @@
  * @swagger
  * /api/sports/{id}:
  *   delete:
- *     summary: Eliminar lógicamente un deporte
+ *     summary: Eliminar físicamente un deporte
  *     description: |
  *       **Requiere autenticación**
  *       
- *       - Realiza una eliminación lógica (cambia activo a false)
- *       - El deporte no se elimina físicamente de la base de datos
- *       - Los deportes eliminados no aparecen en la lista principal
+ *       - Elimina permanentemente el deporte de la base de datos
+ *       - **Solo funciona si el deporte NO tiene canchas asociadas**
+ *       - Si tiene canchas, devuelve error 400 con instrucciones
  *     tags: [Sports]
  *     security:
  *       - bearerAuth: []
@@ -324,28 +324,161 @@
  *         required: true
  *         schema:
  *           type: integer
- *           minimum: 1
+ *         description: ID del deporte a eliminar
+ *     responses:
+ *       200:
+ *         description: Deporte eliminado permanentemente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Deporte eliminado permanentemente
+ *                 action:
+ *                   type: string
+ *                   example: deleted
+ *       400:
+ *         description: No se puede eliminar porque tiene canchas asociadas
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 action:
+ *                   type: string
+ *                 endpoint:
+ *                   type: string
+ *       404:
+ *         description: Deporte no encontrado
+ */
+
+/**
+ * @swagger
+ * /api/sports/{id}/deactivate:
+ *   put:
+ *     summary: Desactivar un deporte (eliminación lógica)
+ *     description: |
+ *       **Requiere autenticación**
+ *       
+ *       - Desactiva el deporte (cambia activo a false)
+ *       - El deporte no se elimina físicamente
+ *       - No estará disponible para nuevas canchas
+ *       - Las canchas existentes siguen funcionando
+ *     tags: [Sports]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
  *         description: ID del deporte a desactivar
- *         example: 1
  *     responses:
  *       200:
  *         description: Deporte desactivado correctamente
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/SportDeleteResponse'
- *       401:
- *         description: No autorizado
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Deporte desactivado correctamente
+ *                 sport:
+ *                   $ref: '#/components/schemas/Sport'
+ *                 action:
+ *                   type: string
+ *                   example: deactivated
+ *       400:
+ *         description: El deporte ya está desactivado
  *       404:
  *         description: Deporte no encontrado
+ */
+
+/**
+ * @swagger
+ * /api/sports/inactive/all:
+ *   get:
+ *     summary: Obtener todos los deportes inactivos
+ *     description: Retorna la lista de deportes que han sido desactivados
+ *     tags: [Sports]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Lista de deportes inactivos
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
- *             example:
- *               message: "Deporte con ID 1 no encontrado"
- *       500:
- *         description: Error del servidor
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Sport'
+ */
+
+/**
+ * @swagger
+ * /api/sports/inactive/{id}:
+ *   get:
+ *     summary: Obtener un deporte inactivo por ID
+ *     tags: [Sports]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Deporte inactivo encontrado
+ *       404:
+ *         description: Deporte inactivo no encontrado
+ */
+
+/**
+ * @swagger
+ * /api/sports/{id}/activate:
+ *   put:
+ *     summary: Activar un deporte desactivado
+ *     description: |
+ *       **Requiere autenticación**
+ *       
+ *       - Reactiva un deporte que estaba desactivado
+ *       - El deporte volverá a estar disponible para nuevas canchas
+ *       - Las canchas existentes se reactivan automáticamente
+ *     tags: [Sports]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Deporte activado correctamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 sport:
+ *                   $ref: '#/components/schemas/Sport'
+ *                 action:
+ *                   type: string
+ *       400:
+ *         description: El deporte ya está activo
+ *       404:
+ *         description: Deporte no encontrado
  */
 
 import express from "express";
@@ -354,8 +487,11 @@ import {
   getSports,
   getSportById,
   updateSport,
-  deleteSport,
-  getInactiveSports
+  getInactiveSports,
+  getInactiveSportById,
+  deactivateSport,
+  activateSport,
+  deleteSportPermanently
 } from "../controllers/sport.js";
 import { authenticateToken } from "../middlewares/authMiddleware.js";
 
@@ -365,8 +501,11 @@ router.post("/", authenticateToken, createSport);
 router.get("/", authenticateToken, getSports);
 router.get("/:id", authenticateToken, getSportById);
 router.put("/:id", authenticateToken, updateSport);
-router.delete("/:id", authenticateToken, deleteSport);
-router.get("/inactive", authenticateToken, getInactiveSports);
+router.get("/inactive/all", authenticateToken, getInactiveSports);
+router.get("/inactive/:id", authenticateToken, getInactiveSportById);
+router.put("/:id/deactivate", authenticateToken, deactivateSport);
+router.put("/:id/activate", authenticateToken, activateSport);
+router.delete("/:id", authenticateToken, deleteSportPermanently);
 
 export default router;
 
