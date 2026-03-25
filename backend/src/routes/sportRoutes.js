@@ -422,36 +422,14 @@
 
 /**
  * @swagger
- * /api/sports/inactive/{id}:
- *   get:
- *     summary: Obtener un deporte inactivo por ID
- *     tags: [Sports]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *     responses:
- *       200:
- *         description: Deporte inactivo encontrado
- *       404:
- *         description: Deporte inactivo no encontrado
- */
-
-/**
- * @swagger
- * /api/sports/{id}/activate:
- *   put:
- *     summary: Activar un deporte desactivado
+ * /api/sports/{id}/status:
+ *   patch:
+ *     summary: Activar o desactivar un deporte
  *     description: |
  *       **Requiere autenticación**
  *       
- *       - Reactiva un deporte que estaba desactivado
- *       - El deporte volverá a estar disponible para nuevas canchas
- *       - Las canchas existentes se reactivan automáticamente
+ *       - Permite activar o desactivar un deporte en un solo endpoint
+ *       - Envía `activo: true` para activar, `activo: false` para desactivar
  *     tags: [Sports]
  *     security:
  *       - bearerAuth: []
@@ -461,9 +439,30 @@
  *         required: true
  *         schema:
  *           type: integer
+ *         description: ID del deporte
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - activo
+ *             properties:
+ *               activo:
+ *                 type: boolean
+ *                 description: true para activar, false para desactivar
+ *                 example: false
+ *           examples:
+ *             desactivar:
+ *               value:
+ *                 activo: false
+ *             activar:
+ *               value:
+ *                 activo: true
  *     responses:
  *       200:
- *         description: Deporte activado correctamente
+ *         description: Estado actualizado correctamente
  *         content:
  *           application/json:
  *             schema:
@@ -475,8 +474,24 @@
  *                   $ref: '#/components/schemas/Sport'
  *                 action:
  *                   type: string
+ *                   enum: [activated, deactivated]
  *       400:
- *         description: El deporte ya está activo
+ *         description: Error de validación
+ *         content:
+ *           application/json:
+ *             examples:
+ *               campoFaltante:
+ *                 value:
+ *                   message: "El campo 'activo' es requerido. Use true para activar o false para desactivar."
+ *               tipoIncorrecto:
+ *                 value:
+ *                   message: "El campo 'activo' debe ser un valor booleano (true/false)"
+ *               yaActivo:
+ *                 value:
+ *                   message: "El deporte ya está activo"
+ *               yaInactivo:
+ *                 value:
+ *                   message: "El deporte ya está inactivo"
  *       404:
  *         description: Deporte no encontrado
  */
@@ -489,8 +504,7 @@ import {
   updateSport,
   getInactiveSports,
   getInactiveSportById,
-  deactivateSport,
-  activateSport,
+  updateSportStatus,
   deleteSportPermanently
 } from "../controllers/sport.js";
 import { authenticateToken } from "../middlewares/authMiddleware.js";
@@ -503,8 +517,7 @@ router.get("/:id", authenticateToken, getSportById);
 router.put("/:id", authenticateToken, updateSport);
 router.get("/inactive/all", authenticateToken, getInactiveSports);
 router.get("/inactive/:id", authenticateToken, getInactiveSportById);
-router.put("/:id/deactivate", authenticateToken, deactivateSport);
-router.put("/:id/activate", authenticateToken, activateSport);
+router.patch("/:id/status", authenticateToken, updateSportStatus);
 router.delete("/:id", authenticateToken, deleteSportPermanently);
 
 export default router;

@@ -31,8 +31,8 @@ export const updateSportService = async (id, data) => {
     }
 
     if (updateData.nombre && updateData.nombre !== sport.nombre) {
-        const existingSport = await Sport.findOne({ 
-            where: { nombre: updateData.nombre } 
+        const existingSport = await Sport.findOne({
+            where: { nombre: updateData.nombre }
         });
         if (existingSport) {
             throw new Error('El nombre del deporte ya existe');
@@ -44,15 +44,15 @@ export const updateSportService = async (id, data) => {
 };
 
 export const getAllInactiveSportsService = async () => {
-    return await Sport.findAll({ 
+    return await Sport.findAll({
         where: { activo: false },
         order: [['updatedAt', 'DESC']]
     });
 };
 
 export const getInactiveSportByIdService = async (id) => {
-    return await Sport.findOne({ 
-        where: { id, activo: false } 
+    return await Sport.findOne({
+        where: { id, activo: false }
     });
 };
 
@@ -61,35 +61,28 @@ export const hasCourtsAssociatedService = async (sportId) => {
     return count > 0;
 };
 
-export const deactivateSportService = async (id) => {
+export const updateSportStatusService = async (id, activo) => {
     const sport = await Sport.findByPk(id);
     if (!sport) return null;
-    
-    await sport.update({ activo: false });
-    return sport;
-};
 
-export const activateSportService = async (id) => {
-    const sport = await Sport.findByPk(id);
-    if (!sport) return null;
-    
-    if (sport.activo) {
-        throw new Error('El deporte ya está activo');
+    if (sport.activo === activo) {
+        const estado = activo ? 'activo' : 'inactivo';
+        throw new Error(`El deporte ya está ${estado}`);
     }
-    
-    await sport.update({ activo: true });
+
+    await sport.update({ activo });
     return sport;
 };
 
 export const deleteSportPermanentlyService = async (id) => {
     const sport = await Sport.findByPk(id);
     if (!sport) return null;
-    
+
     const hasCourts = await hasCourtsAssociatedService(id);
     if (hasCourts) {
         throw new Error('No se puede eliminar un deporte que tiene canchas asociadas');
     }
-    
+
     await sport.destroy();
     return sport;
 };
