@@ -24,42 +24,72 @@ export const updateSportService = async (id, data) => {
     const sport = await Sport.findByPk(id);
     if (!sport) return null;
 
-    if (data.nombre && data.nombre !== sport.nombre) {
-        const existingSport = await Sport.findOne({
-            where: { nombre: data.nombre }
+    const { activo, ...updateData } = data;
+
+    if (data.activo !== undefined) {
+        throw new Error('No se puede modificar el estado del deporte. Use los endpoints /activate o /deactivate');
+    }
+
+    if (updateData.nombre && updateData.nombre !== sport.nombre) {
+        const existingSport = await Sport.findOne({ 
+            where: { nombre: updateData.nombre } 
         });
         if (existingSport) {
             throw new Error('El nombre del deporte ya existe');
         }
     }
 
-    await sport.update(data);
+    await sport.update(updateData);
     return sport;
 };
 
-export const deleteSportService = async (id) => {
-    const sport = await Sport.findByPk(id);
-    if (!sport) return null;
-
-    const courtsCount = await Court.count({ where: { sportId: id } });
-
-    if (courtsCount > 0) {
-        await sport.update({ activo: false });
-        return {
-            sport,
-            message: "El deporte tiene canchas asociadas, se ha desactivado correctamente",
-            type: "deactivated"
-        };
-    } else {
-        await sport.destroy();
-        return {
-            sport,
-            message: "Deporte eliminado permanentemente",
-            type: "deleted"
-        };
-    }
+export const getAllInactiveSportsService = async () => {
+    return await Sport.findAll({ 
+        where: { activo: false },
+        order: [['updatedAt', 'DESC']]
+    });
 };
 
-export const getAllSportsInactiveService = async () => {
-    return await Sport.findAll({ where: { activo: false } });
+export const getInactiveSportByIdService = async (id) => {
+    return await Sport.findOne({ 
+        where: { id, activo: false } 
+    });
+};
+
+export const hasCourtsAssociatedService = async (sportId) => {
+    const count = await Court.count({ where: { sportId } });
+    return count > 0;
+};
+
+export const deactivateSportService = async (id) => {
+    const sport = await Sport.findByPk(id);
+    if (!sport) return null;
+    
+    await sport.update({ activo: false });
+    return sport;
+};
+
+export const activateSportService = async (id) => {
+    const sport = await Sport.findByPk(id);
+    if (!sport) return null;
+    
+    if (sport.activo) {
+        throw new Error('El deporte ya está activo');
+    }
+    
+    await sport.update({ activo: true });
+    return sport;
+};
+
+export const deleteSportPermanentlyService = async (id) => {
+    const sport = await Sport.findByPk(id);
+    if (!sport) return null;
+    
+    const hasCourts = await hasCourtsAssociatedService(id);
+    if (hasCourts) {
+        throw new Error('No se puede eliminar un deporte que tiene canchas asociadas');
+    }
+    
+    await sport.destroy();
+    return sport;
 };
