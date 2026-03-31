@@ -20,6 +20,7 @@ export const createCourtService = async (admin, body, file) => {
         detalles,
         capacidad,
         mallId,
+        sportId,
     } = body;
 
     const requiredFields = [
@@ -33,6 +34,7 @@ export const createCourtService = async (admin, body, file) => {
         "responsable",
         "capacidad",
         "mallId",
+        "sportId",
     ];
 
     for (const field of requiredFields) {
@@ -69,6 +71,7 @@ export const createCourtService = async (admin, body, file) => {
         capacidad,
         imagen,
         mallId,
+        sportId,
     });
 
     return newCourt;
@@ -77,22 +80,14 @@ export const createCourtService = async (admin, body, file) => {
 export const getCourtsService = async (user) => {
     let whereClause = {};
 
-    console.log('=== DEBUG GET COURTS ===');
-    console.log('Usuario recibido:', user);
-
     const userMallId = user.idMall !== undefined ? user.idMall : user.mallId;
-
-    console.log('Mall ID detectado:', userMallId);
 
     if (user.idRol === 2) {
         if (userMallId === undefined || userMallId === null) {
-            console.error('ERROR: Administrador sin centro comercial');
-            console.log('User object:', JSON.stringify(user, null, 2));
             throw new Error("El administrador no tiene un centro comercial asociado");
         }
         whereClause = { mallId: userMallId };
-        console.log('Filtro aplicado: mallId =', userMallId);
-    } else if (user.idRol !== 1) {
+    } else if (user.idRol !== 3) {
         throw new Error("No tienes permisos para ver las canchas.");
     }
 
@@ -102,7 +97,6 @@ export const getCourtsService = async (user) => {
         order: [["id", "ASC"]],
     });
 
-    console.log(`Canchas encontradas: ${canchas.length}`);
     return canchas;
 };
 
@@ -172,10 +166,6 @@ export const getCourtsByMallIdService = async (mallId, user) => {
 
     const mall = await Mall.findByPk(mallId);
     if (!mall) throw new Error("Centro comercial no encontrado");
-
-    /*if (user.idRol === 2 && user.idMall !== mall.id) {
-        throw new Error("No tienes permisos para ver las canchas de este centro comercial");
-    }*/
 
     const canchas = await Court.findAll({
         where: { mallId },

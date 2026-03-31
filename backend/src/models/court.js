@@ -44,13 +44,18 @@ const Court = sequelize.define("Court", {
   detalles: {
     type: DataTypes.TEXT,
   },
-  capacidad: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-  },
   imagen: {
     type: DataTypes.STRING,
   },
+  mallId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+  },
+  sportId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+  }
 });
+
 
 export default Court;
