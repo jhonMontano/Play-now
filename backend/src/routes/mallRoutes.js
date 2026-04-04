@@ -457,54 +457,6 @@
 
 /**
  * @swagger
- * /api/malls/admin/all:
- *   get:
- *     summary: Obtener todos los centros comerciales (incluyendo inactivos)
- *     description: Solo accesible para super administradores. Retorna la lista completa de centros comerciales, tanto activos como inactivos.
- *     tags: [Malls]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: Lista completa de centros comerciales
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Mall'
- *       403:
- *         description: Acceso denegado - Solo super administradores
- *       401:
- *         description: No autorizado
- */
-
-/**
- * @swagger
- * /api/malls/admin/inactive:
- *   get:
- *     summary: Obtener solo centros comerciales inactivos
- *     description: Solo accesible para super administradores. Retorna la lista de centros comerciales con activo=false.
- *     tags: [Malls]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: Lista de centros comerciales inactivos
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Mall'
- *       403:
- *         description: Acceso denegado - Solo super administradores
- *       401:
- *         description: No autorizado
- */
-
-/**
- * @swagger
  * /api/malls/{id}/status:
  *   patch:
  *     summary: Activar o desactivar un centro comercial
@@ -584,61 +536,11 @@
  *         description: No autorizado
  */
 
-/**
- * @swagger
- * /api/malls/admin/all:
- *   get:
- *     summary: Obtener todos los centros comerciales (incluyendo inactivos)
- *     description: Solo accesible para super administradores. Retorna la lista completa de centros comerciales, tanto activos como inactivos.
- *     tags: [Malls]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: Lista completa de centros comerciales
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Mall'
- *       403:
- *         description: Acceso denegado - Solo super administradores
- *       401:
- *         description: No autorizado
- */
-
-/**
- * @swagger
- * /api/malls/admin/inactive:
- *   get:
- *     summary: Obtener solo centros comerciales inactivos
- *     description: Solo accesible para super administradores. Retorna la lista de centros comerciales con activo=false.
- *     tags: [Malls]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: Lista de centros comerciales inactivos
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Mall'
- *       403:
- *         description: Acceso denegado - Solo super administradores
- *       401:
- *         description: No autorizado
- */
-
 import express from "express";
 import { authenticateToken } from "../middlewares/authMiddleware.js";
 import {
   createMallAndAdmin,
   getAllMalls,
-  getAllMallsIncludingInactive,
-  getInactiveMalls,
   getMallById,
   updateMall,
   updateMallStatus,
@@ -650,8 +552,6 @@ const router = express.Router();
 router.get("/", authenticateToken, getAllMalls);
 router.get("/:id", authenticateToken, getMallById);
 router.post("/", authenticateToken, createMallAndAdmin);
-router.get("/admin/all", authenticateToken, getAllMallsIncludingInactive);
-router.get("/admin/inactive", authenticateToken, getInactiveMalls);
 router.put("/:id", authenticateToken, updateMall);
 router.patch("/:id/status", authenticateToken, updateMallStatus);
 router.delete("/:id", authenticateToken, deleteMall);

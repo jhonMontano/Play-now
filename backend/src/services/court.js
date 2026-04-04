@@ -274,3 +274,39 @@ export const statusCourtService = async (id, body) => {
         return { cancha, message: "Cancha activada correctamente" };
     }
 };
+
+export const getActiveCourtService = async (user) => {
+    let whereClause = { activo: true };
+
+    const userMallId = user.idMall !== undefined ? user.idMall : user.mallId;
+
+    if (user.idRol === 2) {
+        if (userMallId === undefined || userMallId === null) {
+            throw new Error("El administrador no tiene un centro comercial asociado");
+        }
+        whereClause = { activo: true, mallId: userMallId };
+    } else if (user.idRol !== 3) {
+        throw new Error("No tienes permisos para ver las canchas.");
+    }
+
+    const canchas = await Court.findAll({
+        where: whereClause,
+        include: [
+            {
+                model: Mall,
+                as: "mall",
+                attributes: ["id", "nombreCentro", "ciudad"]
+            },
+            {
+                model: Sport,
+                as: "deporte",
+                attributes: ["id", "nombre", "descripcion", "cantidad"],
+                where: { activo: true },
+                required: false
+            }
+        ],
+        order: [["nombreCancha", "ASC"]],
+    });
+
+    return canchas;
+};

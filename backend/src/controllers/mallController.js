@@ -1,8 +1,6 @@
 import {
   createMallAndAdminService,
   getAllMallsService,
-  getAllMallsIncludingInactiveService,
-  getAllInactiveMallsService,
   getMallByIdService,
   updateMallService,
   updateMallStatusService,
@@ -48,30 +46,6 @@ export const createMallAndAdmin = async (req, res) => {
 export const getAllMalls = async (req, res) => {
   try {
     const malls = await getAllMallsService();
-    res.json(malls);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-export const getAllMallsIncludingInactive = async (req, res) => {
-  try {
-    if (req.user.idRol !== 1) {
-      return res.status(403).json({ message: "Acceso denegado. Solo super administradores" });
-    }
-    const malls = await getAllMallsIncludingInactiveService();
-    res.json(malls);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-export const getInactiveMalls = async (req, res) => {
-  try {
-    if (req.user.idRol !== 1) {
-      return res.status(403).json({ message: "Acceso denegado. Solo super administradores" });
-    }
-    const malls = await getAllInactiveMallsService();
     res.json(malls);
   } catch (error) {
     res.status(500).json({ message: error.message });
