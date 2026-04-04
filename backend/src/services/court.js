@@ -113,7 +113,18 @@ export const getCourtsService = async (user) => {
 
 export const getCourtByIdService = async (id) => {
     const cancha = await Court.findByPk(id, {
-        include: { model: Mall, as: "mall", attributes: ["nombreCentro", "ciudad"] },
+        include: [
+            { 
+                model: Mall, 
+                as: "mall", 
+                attributes: ["id", "nombreCentro", "ciudad"] 
+            },
+            { 
+                model: Sport, 
+                as: "deporte", 
+                attributes: ["id", "nombre", "descripcion", "cantidad"]
+            }
+        ],
     });
     if (!cancha) throw new Error("Cancha no encontrada");
     return cancha;
