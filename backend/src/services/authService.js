@@ -24,7 +24,7 @@ export const loginUser = async ({ correo, password }) => {
     }
 
     await user.save();
-    throw new Error("Contraseña incorrecta");
+    throw new Error("Usuario o contraseña incorrecta");
   }
 
   user.intentosFallidos = 0;

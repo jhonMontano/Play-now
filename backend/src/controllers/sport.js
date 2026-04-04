@@ -3,8 +3,7 @@ import {
   getAllSportsService,
   getSportByIdService,
   updateSportService,
-  getAllInactiveSportsService,
-  getInactiveSportByIdService,
+  getAllActiveSportsService,
   hasCourtsAssociatedService,
   updateSportStatusService,
   deleteSportPermanentlyService
@@ -64,9 +63,9 @@ export const updateSport = async (req, res) => {
   }
 };
 
-export const getInactiveSports = async (req, res) => {
+export const getActiveSports = async (req, res) => {
   try {
-    const sports = await getAllInactiveSportsService();
+    const sports = await getAllActiveSportsService();
     res.json(sports);
   } catch (error) {
     res.status(500).json({ message: error.message });

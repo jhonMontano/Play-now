@@ -43,9 +43,9 @@ export const updateSportService = async (id, data) => {
     return sport;
 };
 
-export const getAllInactiveSportsService = async () => {
+export const getAllActiveSportsService = async () => {
     return await Sport.findAll({
-        where: { activo: false },
+        where: { activo: true },
         order: [['updatedAt', 'DESC']]
     });
 };

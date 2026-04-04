@@ -251,6 +251,9 @@
  *               mallNoExiste:
  *                 value:
  *                   message: "El centro comercial especificado no existe"
+ *               nombreDuplicado:
+ *                 value:
+ *                   message: "Ya existe una cancha con ese nombre"
  *       401:
  *         description: No autorizado
  *       500:
@@ -466,6 +469,9 @@
  *               mallNoExiste:
  *                 value:
  *                   message: "El centro comercial especificado no existe"
+ *               nombreDuplicado:
+ *                 value:
+ *                   message: "Ya existe otra cancha con ese nombre"
  *       401:
  *         description: No autorizado
  *       404:

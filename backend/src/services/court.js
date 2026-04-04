@@ -2,6 +2,7 @@ import Court from "../models/court.js";
 import Mall from "../models/mall.js";
 import Sport from "../models/sport.js";
 import Reservation from "../models/reservation.js";
+import { Op } from "sequelize";
 import fs from "fs";
 import path from "path";
 
@@ -46,6 +47,18 @@ export const createCourtService = async (admin, body, file) => {
     const mall = await Mall.findByPk(mallId);
     if (!mall) {
         throw new Error("El centro comercial especificado no existe");
+    }
+
+    const existingCourt = await Court.findOne({
+        where: {
+            nombreCancha: {
+                [Op.iLike]: nombreCancha.trim()
+            }
+        }
+    });
+
+    if (existingCourt) {
+        throw new Error("Ya existe una cancha con ese nombre");
     }
 
     if (isNaN(valorHora) || Number(valorHora) <= 0) {
@@ -135,6 +148,23 @@ export const updateCourtService = async (id, data, file) => {
     const cancha = await Court.findByPk(id);
     if (!cancha) throw new Error("Cancha no encontrada");
 
+    if (data.nombreCancha && data.nombreCancha.trim() !== cancha.nombreCancha) {
+        const existingCourt = await Court.findOne({
+            where: {
+                nombreCancha: {
+                    [Op.iLike]: data.nombreCancha.trim()
+                },
+                id: {
+                    [Op.ne]: id
+                }
+            }
+        });
+
+        if (existingCourt) {
+            throw new Error("Ya existe otra cancha con ese nombre");
+        }
+    }
+
     if (data.mallId && data.mallId !== cancha.mallId) {
         const mall = await Mall.findByPk(data.mallId);
         if (!mall) {
@@ -220,7 +250,7 @@ export const statusCourtService = async (id, body) => {
             throw new Error("La cancha ya está inactiva");
         }
 
-        const reservasActivas = await Reservation.count({
+        /*const reservasActivas = await Reservation.count({
             where: {
                 courtId: id,
                 estado: "Activa"
@@ -229,7 +259,7 @@ export const statusCourtService = async (id, body) => {
 
         if (reservasActivas > 0) {
             throw new Error(`No se puede inactivar la cancha porque tiene ${reservasActivas} reserva(s) activa(s)`);
-        }
+        }*/
 
         await cancha.update({ activo: false });
         return { cancha, message: "Cancha inactivada correctamente" };
