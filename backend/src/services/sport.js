@@ -13,7 +13,7 @@ export const createSportService = async (data) => {
 };
 
 export const getAllSportsService = async () => {
-    return await Sport.findAll({ where: { activo: true } });
+    return await Sport.findAll();
 };
 
 export const getSportByIdService = async (id) => {
