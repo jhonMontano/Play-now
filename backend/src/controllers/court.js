@@ -5,7 +5,8 @@ import {
   updateCourtService,
   deleteCourtService,
   getCourtsByMallIdService,
-  statusCourtService
+  statusCourtService,
+  getActiveCourtService
 } from "../services/court.js";
 
 export const createCourt = async (req, res) => {
@@ -69,5 +70,14 @@ export const statusCourt = async (req, res) => {
     res.json({ message: result.message, cancha: result.cancha });
   } catch (error) {
     res.status(400).json({ message: error.message });
+  }
+};
+
+export const getActiveCourts = async (req, res) => {
+  try {
+    const canchas = await getActiveCourtService(req.user);
+    res.json(canchas);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };

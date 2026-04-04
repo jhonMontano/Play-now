@@ -307,6 +307,46 @@
 
 /**
  * @swagger
+ * /api/courts/active:
+ *   get:
+ *     summary: Obtener lista de canchas activas
+ *     description: Obtiene solo las canchas con estado activo. Accesible para administradores y clientes
+ *     tags: [Courts]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Lista de canchas activas obtenida exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 allOf:
+ *                   - $ref: '#/components/schemas/Court'
+ *                   - type: object
+ *                     properties:
+ *                       activo:
+ *                         type: boolean
+ *                         example: true
+ *       401:
+ *         description: No autorizado
+ *       403:
+ *         description: Sin permisos
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "No tienes permisos para ver las canchas"
+ *       500:
+ *         description: Error del servidor
+ */
+
+/**
+ * @swagger
  * /api/courts/mall/{mallId}:
  *   get:
  *     summary: Obtener canchas por centro comercial
@@ -630,7 +670,8 @@ import {
   updateCourt, 
   deleteCourt,
   getCourtsByMallId,
-  statusCourt
+  statusCourt,
+  getActiveCourts
 } from "../controllers/court.js";
 
 const router = Router();
@@ -656,6 +697,7 @@ const upload = multer({
 
 router.post("/", authenticateToken, upload.single("imagen"), createCourt);
 router.get("/", authenticateToken, getCourts);
+router.get("/active", authenticateToken, getActiveCourts);
 router.get("/mall/:mallId", authenticateToken, getCourtsByMallId); 
 router.get("/:id", authenticateToken, getCourtById);
 router.put("/:id", authenticateToken, upload.single("imagen"), updateCourt);

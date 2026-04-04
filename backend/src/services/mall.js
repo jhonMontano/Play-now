@@ -101,55 +101,6 @@ export const getAllMallsService = async () => {
   });
 };
 
-export const getAllMallsIncludingInactiveService = async () => {
-  return await Mall.findAll({
-    include: {
-      model: User,
-      as: "administrador",
-      attributes: [
-        "id",
-        "primerNombre",
-        "segundoNombre",
-        "primerApellido",
-        "segundoApellido",
-        "correo",
-        "celular",
-        "idRol",
-        "activo",
-        "numeroDocumento",
-        "tipoDocumento",
-        "direccion",
-      ],
-    },
-    order: [["activo", "DESC"], ["nombreCentro", "ASC"]],
-  });
-};
-
-export const getAllInactiveMallsService = async () => {
-  return await Mall.findAll({
-    where: { activo: false },
-    include: {
-      model: User,
-      as: "administrador",
-      attributes: [
-        "id",
-        "primerNombre",
-        "segundoNombre",
-        "primerApellido",
-        "segundoApellido",
-        "correo",
-        "celular",
-        "idRol",
-        "activo",
-        "numeroDocumento",
-        "tipoDocumento",
-        "direccion",
-      ],
-    },
-    order: [["nombreCentro", "ASC"]],
-  });
-};
-
 export const getMallByIdService = async (id) => {
   const mall = await Mall.findByPk(id, {
     include: {
