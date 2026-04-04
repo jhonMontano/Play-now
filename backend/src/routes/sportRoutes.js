@@ -53,6 +53,22 @@
  *           description: Cantidad total de jugadores (ambos equipos)
  *           example: 14
  *
+ *     SportUpdateRequest:
+ *       type: object
+ *       properties:
+ *         nombre:
+ *           type: string
+ *           description: Nombre del deporte (debe ser único)
+ *           example: Fútbol Sala
+ *         descripcion:
+ *           type: string
+ *           description: Descripción detallada del deporte
+ *           example: Fútbol sala profesional
+ *         cantidad:
+ *           type: integer
+ *           description: Cantidad total de jugadores (ambos equipos)
+ *           example: 10
+ *
  *     SportStatusUpdateRequest:
  *       type: object
  *       required:
@@ -152,20 +168,7 @@
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             required:
- *               - nombre
- *               - cantidad
- *             properties:
- *               nombre:
- *                 type: string
- *                 example: Fútbol 7
- *               descripcion:
- *                 type: string
- *                 example: Fútbol 7, 7 jugadores por equipo
- *               cantidad:
- *                 type: integer
- *                 example: 14
+ *             $ref: '#/components/schemas/SportInput'
  *           examples:
  *             deporteFutbol7:
  *               value:
@@ -241,20 +244,19 @@
 
 /**
  * @swagger
- * /api/sports/inactive/all:
+ * /api/sports/active/all:
  *   get:
- *     summary: Obtener todos los deportes inactivos
+ *     summary: Obtener todos los deportes activos
  *     description: |
  *       **Requiere autenticación**
  *       
- *       - Retorna la lista de deportes que han sido desactivados (activo = false)
- *       - Útil para administradores que quieran reactivar deportes
+ *       - Retorna la lista de deportes que están activos (activo = true)
  *     tags: [Sports]
  *     security:
  *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: Lista de deportes inactivos
+ *         description: Lista de deportes activos
  *         content:
  *           application/json:
  *             schema:
@@ -359,17 +361,7 @@
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               nombre:
- *                 type: string
- *                 example: Fútbol Sala
- *               descripcion:
- *                 type: string
- *                 example: Fútbol sala profesional
- *               cantidad:
- *                 type: integer
- *                 example: 10
+ *             $ref: '#/components/schemas/SportUpdateRequest'
  *           examples:
  *             actualizarNombre:
  *               value:
@@ -529,7 +521,7 @@ import {
   getSports,
   getSportById,
   updateSport,
-  getInactiveSports,
+  getActiveSports,
   getInactiveSportById,
   updateSportStatus,
   deleteSportPermanently
@@ -540,10 +532,10 @@ const router = express.Router();
 
 router.post("/", authenticateToken, createSport);
 router.get("/", authenticateToken, getSports);
+router.get("/active/all", authenticateToken, getActiveSports);
+router.get("/inactive/:id", authenticateToken, getInactiveSportById);
 router.get("/:id", authenticateToken, getSportById);
 router.put("/:id", authenticateToken, updateSport);
-router.get("/inactive/all", authenticateToken, getInactiveSports);
-router.get("/inactive/:id", authenticateToken, getInactiveSportById);
 router.patch("/:id/status", authenticateToken, updateSportStatus);
 router.delete("/:id", authenticateToken, deleteSportPermanently);
 
