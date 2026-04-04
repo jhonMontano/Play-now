@@ -1,5 +1,6 @@
 import Court from "../models/court.js";
 import Mall from "../models/mall.js";
+import Sport from "../models/sport.js";
 import fs from "fs";
 import path from "path";
 
@@ -18,7 +19,6 @@ export const createCourtService = async (admin, body, file) => {
         direccion,
         responsable,
         detalles,
-        capacidad,
         mallId,
         sportId,
     } = body;
@@ -32,7 +32,6 @@ export const createCourtService = async (admin, body, file) => {
         "telefono",
         "direccion",
         "responsable",
-        "capacidad",
         "mallId",
         "sportId",
     ];
@@ -68,7 +67,6 @@ export const createCourtService = async (admin, body, file) => {
         direccion,
         responsable,
         detalles,
-        capacidad,
         imagen,
         mallId,
         sportId,
@@ -93,7 +91,20 @@ export const getCourtsService = async (user) => {
 
     const canchas = await Court.findAll({
         where: whereClause,
-        include: { model: Mall, as: "mall", attributes: ["nombreCentro", "ciudad"] },
+        include: [
+            {
+                model: Mall,
+                as: "mall",
+                attributes: ["id", "nombreCentro", "ciudad"]
+            },
+            {
+                model: Sport,
+                as: "deporte",
+                attributes: ["id", "nombre", "descripcion", "cantidad"],
+                where: { activo: true },
+                required: false
+            }
+        ],
         order: [["id", "ASC"]],
     });
 

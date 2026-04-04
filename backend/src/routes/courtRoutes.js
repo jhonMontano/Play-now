@@ -13,7 +13,6 @@
  *         - telefono
  *         - direccion
  *         - responsable
- *         - capacidad
  *         - mallId
  *       properties:
  *         id:
@@ -59,10 +58,6 @@
  *           type: string
  *           description: Detalles adicionales de la cancha
  *           example: "Cancha sintética, iluminación LED, vestieres incluidos"
- *         capacidad:
- *           type: integer
- *           description: Capacidad máxima de jugadores
- *           example: 10
  *         imagen:
  *           type: string
  *           description: Nombre del archivo de imagen
@@ -97,7 +92,6 @@
  *         - telefono
  *         - direccion
  *         - responsable
- *         - capacidad
  *         - mallId
  *       properties:
  *         nombreCancha:
@@ -127,9 +121,6 @@
  *         detalles:
  *           type: string
  *           example: "Piso de madera, aro regulable"
- *         capacidad:
- *           type: integer
- *           example: 14
  *         mallId:
  *           type: integer
  *           example: 2
@@ -155,8 +146,6 @@
  *           type: string
  *         detalles:
  *           type: string
- *         capacidad:
- *           type: integer
  *         mallId:
  *           type: integer
  * 
@@ -198,7 +187,6 @@
  *               - telefono
  *               - direccion
  *               - responsable
- *               - capacidad
  *               - mallId
  *             properties:
  *               nombreCancha:
@@ -219,8 +207,6 @@
  *                 type: string
  *               detalles:
  *                 type: string
- *               capacidad:
- *                 type: integer
  *               mallId:
  *                 type: integer
  *               imagen:
@@ -443,8 +429,6 @@
  *                 type: string
  *               detalles:
  *                 type: string
- *               capacidad:
- *                 type: integer
  *               mallId:
  *                 type: integer
  *               imagen:
