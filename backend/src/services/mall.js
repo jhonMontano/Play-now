@@ -79,7 +79,6 @@ export const createMallAndAdminService = async (creatorUser, mallData, adminData
 
 export const getAllMallsService = async () => {
   return await Mall.findAll({
-    where: { activo: true },
     include: {
       model: User,
       as: "administrador",
