@@ -1,6 +1,7 @@
 import Court from "../models/court.js";
 import Mall from "../models/mall.js";
 import Sport from "../models/sport.js";
+import Reservation from "../models/reservation.js";
 import fs from "fs";
 import path from "path";
 
@@ -200,4 +201,46 @@ export const getCourtsByMallIdService = async (mallId, user) => {
     });
 
     return canchas;
+};
+
+export const statusCourtService = async (id, body) => {
+    const cancha = await Court.findByPk(id);
+    if (!cancha) {
+        throw new Error("Cancha no encontrada");
+    }
+
+    const { activo } = body;
+
+    if (typeof activo !== "boolean") {
+        throw new Error("El campo 'activo' debe ser un boolean (true o false)");
+    }
+
+    if (!activo) {
+        if (!cancha.activo) {
+            throw new Error("La cancha ya está inactiva");
+        }
+
+        const reservasActivas = await Reservation.count({
+            where: {
+                courtId: id,
+                estado: "Activa"
+            }
+        });
+
+        if (reservasActivas > 0) {
+            throw new Error(`No se puede inactivar la cancha porque tiene ${reservasActivas} reserva(s) activa(s)`);
+        }
+
+        await cancha.update({ activo: false });
+        return { cancha, message: "Cancha inactivada correctamente" };
+    }
+
+    if (activo) {
+        if (cancha.activo) {
+            throw new Error("La cancha ya está activa");
+        }
+
+        await cancha.update({ activo: true });
+        return { cancha, message: "Cancha activada correctamente" };
+    }
 };
