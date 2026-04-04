@@ -47,6 +47,10 @@ const Court = sequelize.define("Court", {
   imagen: {
     type: DataTypes.STRING,
   },
+  activo: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: true,
+  },
   mallId: {
     type: DataTypes.INTEGER,
     allowNull: false,

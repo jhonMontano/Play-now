@@ -474,6 +474,107 @@
 
 /**
  * @swagger
+ * /api/courts/{id}/status:
+ *   patch:
+ *     summary: Activar o inactivar una cancha
+ *     description: Activa o inactiva una cancha según el valor enviado. Si inactiva, verifica que no tenga reservas activas
+ *     tags: [Courts]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID de la cancha
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - activo
+ *             properties:
+ *               activo:
+ *                 type: boolean
+ *                 description: true para activar, false para inactivar
+ *                 example: false
+ *           examples:
+ *             inactivar:
+ *               summary: Inactivar una cancha
+ *               value:
+ *                 activo: false
+ *             activar:
+ *               summary: Activar una cancha
+ *               value:
+ *                 activo: true
+ *     responses:
+ *       200:
+ *         description: Operación exitosa
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 cancha:
+ *                   $ref: '#/components/schemas/Court'
+ *             examples:
+ *               inactivada:
+ *                 value:
+ *                   message: "Cancha inactivada correctamente"
+ *                   cancha:
+ *                     id: 1
+ *                     nombreCancha: "Cancha Principal"
+ *                     activo: false
+ *               activada:
+ *                 value:
+ *                   message: "Cancha activada correctamente"
+ *                   cancha:
+ *                     id: 1
+ *                     nombreCancha: "Cancha Principal"
+ *                     activo: true
+ *       400:
+ *         description: Error en la solicitud
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *             examples:
+ *               reservasActivas:
+ *                 value:
+ *                   message: "No se puede inactivar la cancha porque tiene 2 reserva(s) activa(s)"
+ *               yaInactiva:
+ *                 value:
+ *                   message: "La cancha ya está inactiva"
+ *               yaActiva:
+ *                 value:
+ *                   message: "La cancha ya está activa"
+ *               tipoIncorrecto:
+ *                 value:
+ *                   message: "El campo 'activo' debe ser un boolean (true o false)"
+ *       401:
+ *         description: No autorizado
+ *       404:
+ *         description: Cancha no encontrada
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Cancha no encontrada"
+ */
+
+/**
+ * @swagger
  * /api/courts/{id}:
  *   delete:
  *     summary: Eliminar una cancha
@@ -522,7 +623,8 @@ import {
   getCourtById, 
   updateCourt, 
   deleteCourt,
-  getCourtsByMallId
+  getCourtsByMallId,
+  statusCourt
 } from "../controllers/court.js";
 
 const router = Router();
@@ -551,6 +653,7 @@ router.get("/", authenticateToken, getCourts);
 router.get("/mall/:mallId", authenticateToken, getCourtsByMallId); 
 router.get("/:id", authenticateToken, getCourtById);
 router.put("/:id", authenticateToken, upload.single("imagen"), updateCourt);
+router.patch("/:id/status", authenticateToken, statusCourt);
 router.delete("/:id", authenticateToken, deleteCourt);
 
 export default router;
