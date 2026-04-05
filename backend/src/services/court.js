@@ -310,3 +310,31 @@ export const getActiveCourtService = async (user) => {
 
     return canchas;
 };
+
+export const getActiveCourtsByMallIdService = async (mallId) => {
+    if (!mallId) throw new Error("Debe proporcionar el ID del centro comercial");
+
+    const mall = await Mall.findByPk(mallId);
+    if (!mall) throw new Error("Centro comercial no encontrado");
+
+    const canchas = await Court.findAll({
+        where: { mallId, activo: true },
+        include: [
+            {
+                model: Mall,
+                as: "mall",
+                attributes: ["id", "nombreCentro", "ciudad"]
+            },
+            {
+                model: Sport,
+                as: "deporte",
+                attributes: ["id", "nombre", "descripcion", "cantidad"],
+                where: { activo: true },
+                required: false
+            }
+        ],
+        order: [["nombreCancha", "ASC"]],
+    });
+
+    return canchas;
+};
