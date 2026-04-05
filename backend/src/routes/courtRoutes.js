@@ -347,6 +347,60 @@
 
 /**
  * @swagger
+ * /api/courts/active/mall/{mallId}:
+ *   get:
+ *     summary: Obtener canchas activas por centro comercial
+ *     description: Obtiene solo las canchas activas de un centro comercial específico
+ *     tags: [Courts]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: mallId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID del centro comercial
+ *         example: 1
+ *     responses:
+ *       200:
+ *         description: Lista de canchas activas del centro comercial obtenida exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 allOf:
+ *                   - $ref: '#/components/schemas/Court'
+ *                   - type: object
+ *                     properties:
+ *                       activo:
+ *                         type: boolean
+ *                         example: true
+ *       400:
+ *         description: Error en la solicitud
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *             examples:
+ *               mallIdRequerido:
+ *                 value:
+ *                   message: "Debe proporcionar el ID del centro comercial"
+ *               mallNoEncontrado:
+ *                 value:
+ *                   message: "Centro comercial no encontrado"
+ *       401:
+ *         description: No autorizado
+ *       500:
+ *         description: Error del servidor
+ */
+
+/**
+ * @swagger
  * /api/courts/mall/{mallId}:
  *   get:
  *     summary: Obtener canchas por centro comercial
@@ -671,7 +725,8 @@ import {
   deleteCourt,
   getCourtsByMallId,
   statusCourt,
-  getActiveCourts
+  getActiveCourts,
+  getActiveCourtsByMallId
 } from "../controllers/court.js";
 
 const router = Router();
@@ -698,6 +753,7 @@ const upload = multer({
 router.post("/", authenticateToken, upload.single("imagen"), createCourt);
 router.get("/", authenticateToken, getCourts);
 router.get("/active", authenticateToken, getActiveCourts);
+router.get("/active/mall/:mallId", authenticateToken, getActiveCourtsByMallId);
 router.get("/mall/:mallId", authenticateToken, getCourtsByMallId); 
 router.get("/:id", authenticateToken, getCourtById);
 router.put("/:id", authenticateToken, upload.single("imagen"), updateCourt);
