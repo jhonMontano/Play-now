@@ -6,7 +6,8 @@ import {
   deleteCourtService,
   getCourtsByMallIdService,
   statusCourtService,
-  getActiveCourtService
+  getActiveCourtService,
+  getActiveCourtsByMallIdService
 } from "../services/court.js";
 
 export const createCourt = async (req, res) => {
@@ -79,5 +80,15 @@ export const getActiveCourts = async (req, res) => {
     res.json(canchas);
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+};
+
+export const getActiveCourtsByMallId = async (req, res) => {
+  try {
+    const { mallId } = req.params;
+    const canchas = await getActiveCourtsByMallIdService(mallId);
+    res.status(200).json(canchas);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
   }
 };
