@@ -3,6 +3,18 @@ import Court from "../models/court.js";
 
 export const createSportService = async (data) => {
     try {
+        if (!data.nombre || data.nombre.trim() === '') {
+            throw new Error('El nombre del deporte es requerido y no puede estar vacío');
+        }
+        
+        if (data.cantidad === null || data.cantidad === undefined || data.cantidad === '') {
+            throw new Error('La cantidad es requerida');
+        }
+        
+        if (isNaN(data.cantidad) || data.cantidad < 1) {
+            throw new Error('La cantidad debe ser un número válido y mayor o igual a 1');
+        }
+        
         return await Sport.create(data);
     } catch (error) {
         if (error.name === 'SequelizeUniqueConstraintError') {
@@ -28,6 +40,20 @@ export const updateSportService = async (id, data) => {
 
     if (data.activo !== undefined) {
         throw new Error('No se puede modificar el estado del deporte. Use los endpoints /activate o /deactivate');
+    }
+
+    if (updateData.nombre !== undefined && (updateData.nombre === null || updateData.nombre.trim() === '')) {
+        throw new Error('El nombre del deporte no puede estar vacío');
+    }
+    
+    if (updateData.cantidad !== undefined) {
+        if (updateData.cantidad === null || updateData.cantidad === '') {
+            throw new Error('La cantidad no puede estar vacía');
+        }
+        
+        if (isNaN(updateData.cantidad) || updateData.cantidad < 1) {
+            throw new Error('La cantidad debe ser un número válido y mayor o igual a 1');
+        }
     }
 
     if (updateData.nombre && updateData.nombre !== sport.nombre) {

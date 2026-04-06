@@ -5,7 +5,7 @@ const options = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title: 'PlayNow API Documentation',
+      title: 'PlayNow API Documentación',
       version: '1.0.0',
       description: 'Documentación completa de la API de PlayNow - Sistema de reservas de canchas',
       contact: {
@@ -44,6 +44,6 @@ export default (app) => {
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, {
     explorer: true,
     customCss: '.swagger-ui .topbar { display: none }',
-    customSiteTitle: 'PlayNow API Documentation',
+    customSiteTitle: 'PlayNow API Documentación',
   }));
 };
