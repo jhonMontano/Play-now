@@ -545,12 +545,14 @@ import {
   updateMall,
   updateMallStatus,
   deleteMall,
+  getMallCourts,
 } from "../controllers/mallController.js";
 
 const router = express.Router();
 
 router.get("/", authenticateToken, getAllMalls);
 router.get("/:id", authenticateToken, getMallById);
+router.get("/:id/courts", authenticateToken, getMallCourts);
 router.post("/", authenticateToken, createMallAndAdmin);
 router.put("/:id", authenticateToken, updateMall);
 router.patch("/:id/status", authenticateToken, updateMallStatus);

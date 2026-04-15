@@ -19,9 +19,9 @@ export const authenticateToken = (req, res, next) => {
       idMall: decoded.mallId || decoded.idMall
     };
     
-    console.log('🔐 User autenticado:', req.user);
+    console.log('User autenticado:', req.user);
     next();
   } catch (error) {
-    res.status(403).json({ message: "Token inválido o expirado" });
+    res.status(401).json({ message: "Token inválido o expirado" });
   }
 };

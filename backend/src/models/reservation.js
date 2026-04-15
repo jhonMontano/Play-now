@@ -27,6 +27,14 @@ const Reservation = sequelize.define("Reservation", {
     type: DataTypes.ENUM("Activa", "Cancelada", "Completada"),
     defaultValue: "Activa",
   },
+  courtId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+  },
+  userId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+  },
 });
 
 export default Reservation;
