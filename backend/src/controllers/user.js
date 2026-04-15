@@ -19,6 +19,10 @@ export const register = async (req, res) => {
 
 export const listUsers = async (req, res) => {
   try {
+    const { idRol } = req.user;
+    if (idRol === 3) {
+      return res.status(403).json({ message: "No tienes permisos para acceder a esta información" });
+    }
     const users = await getAllUsers();
     res.json(users);
   } catch (error) {

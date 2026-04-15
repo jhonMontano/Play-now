@@ -19,7 +19,7 @@ export const login = async (req, res) => {
       },
     });
   } catch (error) {
-    res.status(401).json({ message: error.message });
+    res.status(400).json({ message: error.message });
   }
 };
 
