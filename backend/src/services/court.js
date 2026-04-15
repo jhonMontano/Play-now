@@ -58,7 +58,7 @@ export const createCourtService = async (admin, body, file) => {
     });
 
     if (existingCourt) {
-        throw new Error("Ya existe una cancha con ese nombre");
+        throw new Error("ya existe una cancha con ese nombre");
     }
 
     if (isNaN(valorHora) || Number(valorHora) <= 0) {
@@ -128,14 +128,14 @@ export const getCourtsService = async (user) => {
 export const getCourtByIdService = async (id) => {
     const cancha = await Court.findByPk(id, {
         include: [
-            { 
-                model: Mall, 
-                as: "mall", 
-                attributes: ["id", "nombreCentro", "ciudad"] 
+            {
+                model: Mall,
+                as: "mall",
+                attributes: ["id", "nombreCentro", "ciudad"]
             },
-            { 
-                model: Sport, 
-                as: "deporte", 
+            {
+                model: Sport,
+                as: "deporte",
                 attributes: ["id", "nombre", "descripcion", "cantidad"]
             }
         ],
@@ -161,7 +161,7 @@ export const updateCourtService = async (id, data, file) => {
         });
 
         if (existingCourt) {
-            throw new Error("Ya existe otra cancha con ese nombre");
+            throw new Error("ya existe otra cancha con ese nombre");
         }
     }
 
@@ -249,17 +249,6 @@ export const statusCourtService = async (id, body) => {
         if (!cancha.activo) {
             throw new Error("La cancha ya está inactiva");
         }
-
-        /*const reservasActivas = await Reservation.count({
-            where: {
-                courtId: id,
-                estado: "Activa"
-            }
-        });
-
-        if (reservasActivas > 0) {
-            throw new Error(`No se puede inactivar la cancha porque tiene ${reservasActivas} reserva(s) activa(s)`);
-        }*/
 
         await cancha.update({ activo: false });
         return { cancha, message: "Cancha inactivada correctamente" };

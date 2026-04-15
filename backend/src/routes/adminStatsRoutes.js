@@ -99,10 +99,18 @@
 
 import express from "express";
 import { authenticateToken } from "../middlewares/authMiddleware.js";
-import { getAdminStats } from "../controllers/adminStats.js";
+import {
+    getAdminStats,
+    getRevenue,
+    getUsersCount,
+    getMallsCount
+} from "../controllers/adminStats.js";
 
 const router = express.Router();
 
 router.get("/", authenticateToken, getAdminStats);
+router.get("/revenue", authenticateToken, getRevenue);
+router.get("/users-count", authenticateToken, getUsersCount);
+router.get("/malls-count", authenticateToken, getMallsCount);
 
 export default router;

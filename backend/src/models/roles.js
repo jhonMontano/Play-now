@@ -10,6 +10,7 @@ const Roles = sequelize.define("Roles", {
   nombre: {
     type: DataTypes.STRING,
     allowNull: false,
+    unique: true,
   },
 });
 

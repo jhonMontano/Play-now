@@ -6,6 +6,7 @@ import {
   updateMallStatusService,
   deleteMallService,
 } from "../services/mall.js";
+import { getCourtsByMallIdService } from "../services/court.js";
 
 export const createMallAndAdmin = async (req, res) => {
   try {
@@ -36,17 +37,24 @@ export const createMallAndAdmin = async (req, res) => {
       });
     }
 
-    res.status(400).json({
-      message: error.message,
-      details: error.errors
-    });
+    if (error.message.includes("Acceso denegado") || error.message.includes("Solo el super administrador")) {
+      res.status(403).json({
+        message: error.message,
+        details: error.errors
+      });
+    } else {
+      res.status(400).json({
+        message: error.message,
+        details: error.errors
+      });
+    }
   }
 };
 
 export const getAllMalls = async (req, res) => {
   try {
     const malls = await getAllMallsService();
-    res.json(malls);
+    res.json({ malls });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -69,7 +77,13 @@ export const updateMall = async (req, res) => {
       mall: updatedMall,
     });
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    if (error.message.includes("Acceso denegado") || error.message.includes("Solo el super administrador")) {
+      res.status(403).json({ message: error.message });
+    } else if (error.message.includes("no encontrado")) {
+      res.status(404).json({ message: error.message });
+    } else {
+      res.status(400).json({ message: error.message });
+    }
   }
 };
 
@@ -102,7 +116,13 @@ export const updateMallStatus = async (req, res) => {
       action: activo ? "activated" : "deactivated"
     });
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    if (error.message.includes("Acceso denegado") || error.message.includes("Solo el super administrador")) {
+      res.status(403).json({ message: error.message });
+    } else if (error.message.includes("no encontrado")) {
+      res.status(404).json({ message: error.message });
+    } else {
+      res.status(400).json({ message: error.message });
+    }
   }
 };
 
@@ -111,6 +131,26 @@ export const deleteMall = async (req, res) => {
     await deleteMallService(req.user, req.params.id);
     res.json({ message: "Centro comercial y su administrador eliminados correctamente" });
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    if (error.message.includes("Acceso denegado") || error.message.includes("Solo el super administrador")) {
+      res.status(403).json({ message: error.message });
+    } else if (error.message.includes("no encontrado")) {
+      res.status(404).json({ message: error.message });
+    } else {
+      res.status(400).json({ message: error.message });
+    }
+  }
+};
+
+export const getMallCourts = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const courts = await getCourtsByMallIdService(id, req.user);
+    res.status(200).json({ courts });
+  } catch (error) {
+    if (error.message.includes("no encontrado")) {
+      res.status(404).json({ message: error.message });
+    } else {
+      res.status(400).json({ message: error.message });
+    }
   }
 };
