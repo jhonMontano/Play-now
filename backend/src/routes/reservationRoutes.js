@@ -417,6 +417,284 @@
 
 /**
  * @swagger
+ * /api/reservations/court/{courtId}:
+ *   get:
+ *     summary: Obtener todas las reservas de una cancha específica
+ *     description: |
+ *       **Permisos para acceder:**
+ *       - **Usuario (idRol=3)**: Puede ver reservas de canchas públicas o de su centro asignado
+ *       - **Administrador (idRol=2)**: Puede ver reservas de canchas de su centro comercial
+ *       - **Super Admin (idRol=1)**: Puede ver reservas de cualquier cancha
+ *     tags: [Reservations]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: courtId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID único de la cancha
+ *         example: 5
+ *       - in: query
+ *         name: estado
+ *         schema:
+ *           type: string
+ *           enum: [Activa, Cancelada, Completada]
+ *         description: Filtrar por estado de reserva
+ *       - in: query
+ *         name: fecha
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Filtrar por fecha específica (YYYY-MM-DD)
+ *     responses:
+ *       200:
+ *         description: Lista de reservas de la cancha
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Reservation'
+ *             examples:
+ *               reservasCancha:
+ *                 value:
+ *                   - id: 15
+ *                     fechaReserva: "2024-11-20"
+ *                     horaReserva: "18:00"
+ *                     cantidadHoras: 2
+ *                     valorTotal: 90000
+ *                     estado: "Activa"
+ *                     courtId: 5
+ *                   - id: 16
+ *                     fechaReserva: "2024-11-21"
+ *                     horaReserva: "20:00"
+ *                     cantidadHoras: 1
+ *                     valorTotal: 45000
+ *                     estado: "Activa"
+ *                     courtId: 5
+ *       401:
+ *         description: No autorizado - Token no proporcionado o inválido
+ *       403:
+ *         description: Acceso denegado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *             examples:
+ *               sinPermisos:
+ *                 value:
+ *                   message: "No tienes permisos para acceder a las reservas de esta cancha"
+ *       404:
+ *         description: Cancha no encontrada
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Cancha no encontrada"
+ */
+
+/**
+ * @swagger
+ * /api/reservations/{id}:
+ *   get:
+ *     summary: Obtener una reserva específica por ID
+ *     description: |
+ *       **Permisos para acceder:**
+ *       - **Usuario (idRol=3)**: Solo puede ver sus propias reservas
+ *       - **Administrador (idRol=2)**: Puede ver cualquier reserva de su centro comercial
+ *       - **Super Admin (idRol=1)**: Puede ver cualquier reserva
+ *     tags: [Reservations]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *         description: ID único de la reserva
+ *         example: 42
+ *     responses:
+ *       200:
+ *         description: Reserva obtenida exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Reservation'
+ *             examples:
+ *               reservaCompleta:
+ *                 value:
+ *                   id: 42
+ *                   fechaReserva: "2024-11-20"
+ *                   horaReserva: "18:00"
+ *                   cantidadHoras: 2
+ *                   valorTotal: 90000
+ *                   estado: "Activa"
+ *                   courtId: 5
+ *                   userId: 12
+ *                   cancha:
+ *                     id: 5
+ *                     nombreCancha: "Cancha Fut 7 Norte"
+ *                     valorHora: 45000
+ *                   cliente:
+ *                     id: 12
+ *                     primerNombre: "Juan"
+ *                     primerApellido: "Pérez"
+ *                     correo: "juan@example.com"
+ *                   createdAt: "2024-11-19T10:30:00Z"
+ *                   updatedAt: "2024-11-19T10:30:00Z"
+ *       401:
+ *         description: No autorizado - Token no proporcionado o inválido
+ *       403:
+ *         description: Acceso denegado - No tiene permisos para ver esta reserva
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "No tienes permisos para ver esta reserva"
+ *       404:
+ *         description: Reserva no encontrada
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Reserva no encontrada"
+ *
+ *   put:
+ *     summary: Actualizar una reserva existente
+ *     description: |
+ *       **Permisos para actualizar:**
+ *       - **Usuario (idRol=3)**: Solo puede actualizar sus propias reservas
+ *       - **Administrador (idRol=2)**: Puede actualizar cualquier reserva de su centro comercial
+ *       - **Super Admin (idRol=1)**: Puede actualizar cualquier reserva
+ *       
+ *       **Validaciones:**
+ *       - No se pueden actualizar reservas pasadas
+ *       - No se pueden cambiar reservas con estado Cancelada o Completada
+ *       - Sigue las mismas reglas de validación que la creación
+ *     tags: [Reservations]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *         description: ID de la reserva a actualizar
+ *         example: 42
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               courtId:
+ *                 type: integer
+ *                 description: ID de la cancha (opcional, para cambiar cancha)
+ *               fechaReserva:
+ *                 type: string
+ *                 format: date
+ *                 description: Nueva fecha (YYYY-MM-DD)
+ *               horaReserva:
+ *                 type: string
+ *                 pattern: '^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$'
+ *                 description: Nueva hora de inicio (HH:MM)
+ *               cantidadHoras:
+ *                 type: integer
+ *                 minimum: 1
+ *                 maximum: 8
+ *                 description: Nuevas cantidad de horas
+ *             examples:
+ *               cambiarHora:
+ *                 value:
+ *                   horaReserva: "19:00"
+ *               cambiarFecha:
+ *                 value:
+ *                   fechaReserva: "2024-11-21"
+ *               cambiarCancha:
+ *                 value:
+ *                   courtId: 7
+ *                   horaReserva: "18:00"
+ *               cambiarTodasPropiedades:
+ *                 value:
+ *                   courtId: 6
+ *                   fechaReserva: "2024-11-22"
+ *                   horaReserva: "17:00"
+ *                   cantidadHoras: 3
+ *     responses:
+ *       200:
+ *         description: Reserva actualizada exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Reserva actualizada exitosamente"
+ *                 reserva:
+ *                   $ref: '#/components/schemas/Reservation'
+ *       400:
+ *         description: Error en la actualización
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *             examples:
+ *               reservaNoEncontrada:
+ *                 value:
+ *                   message: "Reserva no encontrada"
+ *               reservaPasada:
+ *                 value:
+ *                   message: "No se pueden actualizar reservas pasadas"
+ *               reservaCompletada:
+ *                 value:
+ *                   message: "No se puede actualizar una reserva con estado Completada"
+ *               canchaOcupada:
+ *                 value:
+ *                   message: "La cancha ya está reservada para esa fecha y hora"
+ *               formatoInvalido:
+ *                 value:
+ *                   message: "Formato de hora inválido. Use HH:MM (24 horas)"
+ *       401:
+ *         description: No autorizado - Token no proporcionado o inválido
+ *       403:
+ *         description: Acceso denegado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "No tienes permisos para actualizar esta reserva"
+ *       404:
+ *         description: Reserva no encontrada
+ */
+
+/**
+ * @swagger
  * /api/reservations/cancel/{id}:
  *   put:
  *     summary: Cancelar una reserva
