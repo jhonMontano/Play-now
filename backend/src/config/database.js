@@ -6,10 +6,10 @@ dotenv.config();
 let sequelize;
 
 if (process.env.NODE_ENV === "production") {
-  console.log("🚀 Usando DATABASE_URL (producción)");
+  console.log("Usando DATABASE_URL (producción)");
 
   if (!process.env.DATABASE_URL) {
-    throw new Error("❌ DATABASE_URL no está definida en producción");
+    throw new Error("DATABASE_URL no está definida en producción");
   }
 
   sequelize = new Sequelize(process.env.DATABASE_URL, {
@@ -24,7 +24,7 @@ if (process.env.NODE_ENV === "production") {
   });
 
 } else {
-  console.log("💻 Usando configuración LOCAL");
+  console.log("Usando configuración LOCAL");
 
   sequelize = new Sequelize(
     process.env.DB_NAME,

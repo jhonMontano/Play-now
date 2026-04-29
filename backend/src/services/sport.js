@@ -25,7 +25,9 @@ export const createSportService = async (data) => {
 };
 
 export const getAllSportsService = async () => {
-    return await Sport.findAll();
+    return await Sport.findAll({
+        order: [['nombre', 'ASC']]
+    });
 };
 
 export const getSportByIdService = async (id) => {
@@ -72,7 +74,7 @@ export const updateSportService = async (id, data) => {
 export const getAllActiveSportsService = async () => {
     return await Sport.findAll({
         where: { activo: true },
-        order: [['updatedAt', 'DESC']]
+        order: [['nombre', 'ASC']]
     });
 };
 

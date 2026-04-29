@@ -4,7 +4,7 @@ import User from "../models/user.js";
 
 export const loginUser = async ({ correo, password }) => {
   const user = await User.findOne({ where: { correo } });
-  if (!user) throw new Error("Correo no registrado");
+  if (!user) throw new Error("Correo y/o contraseña incorrecta");
 
   if (user.bloqueadoHasta && user.bloqueadoHasta > new Date()) {
     const minutosRestantes = Math.ceil((user.bloqueadoHasta - new Date()) / 60000);
