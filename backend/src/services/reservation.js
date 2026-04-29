@@ -132,7 +132,14 @@ export const getReservationsService = async (user) => {
         {
           model: Court,
           as: "cancha",
-          attributes: ["id", "nombreCancha", "direccion", "valorHora", "horarioInicio", "horarioFin", "mallId"]
+          attributes: ["id", "nombreCancha", "direccion", "valorHora", "horarioInicio", "horarioFin", "mallId"],
+          include: [
+            {
+              model: Mall,
+              as: "mall",
+              attributes: ["id", "nombreCentro", "direccion", "telefono", "ciudad"]
+            }
+          ]
         }
       ],
       order: [["fechaReserva", "DESC"], ["horaReserva", "ASC"]],
@@ -150,7 +157,14 @@ export const getReservationsService = async (user) => {
           model: Court,
           as: "cancha",
           attributes: ["id", "nombreCancha", "direccion", "valorHora", "horarioInicio", "horarioFin", "mallId"],
-          where: { mallId: user.idMall }
+          where: { mallId: user.idMall },
+          include: [
+            {
+              model: Mall,
+              as: "mall",
+              attributes: ["id", "nombreCentro", "direccion", "telefono", "ciudad"]
+            }
+          ]
         },
         {
           model: User,
@@ -168,7 +182,14 @@ export const getReservationsService = async (user) => {
         {
           model: Court,
           as: "cancha",
-          attributes: ["id", "nombreCancha", "direccion", "valorHora", "horarioInicio", "horarioFin", "mallId"]
+          attributes: ["id", "nombreCancha", "direccion", "valorHora", "horarioInicio", "horarioFin", "mallId"],
+          include: [
+            {
+              model: Mall,
+              as: "mall",
+              attributes: ["id", "nombreCentro", "direccion", "telefono", "ciudad"]
+            }
+          ]
         },
         {
           model: User,
@@ -198,7 +219,14 @@ export const getReservationsByMallService = async (user, mallId) => {
         model: Court,
         as: "cancha",
         attributes: ["id", "nombreCancha", "direccion", "valorHora", "horarioInicio", "horarioFin", "mallId"],
-        where: { mallId: Number(mallId) }
+        where: { mallId: Number(mallId) },
+        include: [
+          {
+            model: Mall,
+            as: "mall",
+            attributes: ["id", "nombreCentro", "direccion", "telefono", "ciudad"]
+          }
+        ]
       },
       {
         model: User,
@@ -218,7 +246,14 @@ export const getReservationByIdService = async (user, id) => {
       {
         model: Court,
         as: "cancha",
-        attributes: ["id", "nombreCancha", "direccion", "valorHora", "horarioInicio", "horarioFin", "diasDisponibles", "mallId"]
+        attributes: ["id", "nombreCancha", "direccion", "valorHora", "horarioInicio", "horarioFin", "diasDisponibles", "mallId"],
+        include: [
+          {
+            model: Mall,
+            as: "mall",
+            attributes: ["id", "nombreCentro", "direccion", "telefono", "ciudad"]
+          }
+        ]
       },
       {
         model: User,

@@ -71,12 +71,20 @@
  *               type: string
  *             diasDisponibles:
  *               type: string
+ *             mallId:
+ *               type: integer
  *             mall:
  *               type: object
  *               properties:
  *                 id:
  *                   type: integer
  *                 nombreCentro:
+ *                   type: string
+ *                 direccion:
+ *                   type: string
+ *                 telefono:
+ *                   type: string
+ *                 ciudad:
  *                   type: string
  *         cliente:
  *           type: object
@@ -545,6 +553,13 @@
  *                     id: 5
  *                     nombreCancha: "Cancha Fut 7 Norte"
  *                     valorHora: 45000
+ *                     mallId: 2
+ *                     mall:
+ *                       id: 2
+ *                       nombreCentro: "Mall Central"
+ *                       direccion: "Av. Principal 123"
+ *                       telefono: "+57 312 345 6789"
+ *                       ciudad: "Bogotá"
  *                   cliente:
  *                     id: 12
  *                     primerNombre: "Juan"
