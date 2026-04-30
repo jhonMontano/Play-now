@@ -1,3 +1,6 @@
+import dotenv from "dotenv";
+dotenv.config();
+
 import app from "./src/app.js";
 import sequelize from "./src/config/database.js";
 import Roles from "./src/models/roles.js";
