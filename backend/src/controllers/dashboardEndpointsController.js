@@ -141,7 +141,7 @@ export const getMallAdministratorsController = async (req, res) => {
 
 export const getMallAdminKPIsController = async (req, res) => {
     try {
-        const { idRol, mallId } = req.user;
+        const { idRol, idMall } = req.user;
 
         if (idRol !== 2) {
             return res.status(403).json({
@@ -149,13 +149,13 @@ export const getMallAdminKPIsController = async (req, res) => {
             });
         }
 
-        if (!mallId) {
+        if (!idMall) {
             return res.status(403).json({
                 message: "No tienes un centro comercial asignado"
             });
         }
 
-        const kpis = await getMallAdminKPIs(mallId);
+        const kpis = await getMallAdminKPIs(idMall);
 
         res.json({
             message: "KPIs del centro obtenidos correctamente",
@@ -172,7 +172,7 @@ export const getMallAdminKPIsController = async (req, res) => {
 
 export const getMallCourtsController = async (req, res) => {
     try {
-        const { idRol, mallId } = req.user;
+        const { idRol, idMall } = req.user;
 
         if (idRol !== 2) {
             return res.status(403).json({
@@ -180,13 +180,13 @@ export const getMallCourtsController = async (req, res) => {
             });
         }
 
-        if (!mallId) {
+        if (!idMall) {
             return res.status(403).json({
                 message: "No tienes un centro comercial asignado"
             });
         }
 
-        const courts = await getMallCourts(mallId);
+        const courts = await getMallCourts(idMall);
 
         res.json({
             message: "Canchas del centro obtenidas correctamente",
@@ -203,7 +203,7 @@ export const getMallCourtsController = async (req, res) => {
 
 export const getRecentReservationsController = async (req, res) => {
     try {
-        const { idRol, mallId } = req.user;
+        const { idRol, idMall } = req.user;
         const { limit = 10 } = req.query;
 
         if (idRol !== 2) {
@@ -212,13 +212,13 @@ export const getRecentReservationsController = async (req, res) => {
             });
         }
 
-        if (!mallId) {
+        if (!idMall) {
             return res.status(403).json({
                 message: "No tienes un centro comercial asignado"
             });
         }
 
-        const reservations = await getRecentReservations(mallId, parseInt(limit));
+        const reservations = await getRecentReservations(idMall, parseInt(limit));
 
         res.json({
             message: "Reservas recientes obtenidas correctamente",
@@ -235,7 +235,7 @@ export const getRecentReservationsController = async (req, res) => {
 
 export const getTopCourtsController = async (req, res) => {
     try {
-        const { idRol, mallId } = req.user;
+        const { idRol, idMall } = req.user;
 
         if (idRol !== 2) {
             return res.status(403).json({
@@ -243,13 +243,13 @@ export const getTopCourtsController = async (req, res) => {
             });
         }
 
-        if (!mallId) {
+        if (!idMall) {
             return res.status(403).json({
                 message: "No tienes un centro comercial asignado"
             });
         }
 
-        const topCourts = await getTopCourts(mallId);
+        const topCourts = await getTopCourts(idMall);
 
         res.json({
             message: "Top 5 canchas obtenidas correctamente",
@@ -266,7 +266,7 @@ export const getTopCourtsController = async (req, res) => {
 
 export const getDayReservationStatusController = async (req, res) => {
     try {
-        const { idRol, mallId } = req.user;
+        const { idRol, idMall } = req.user;
 
         if (idRol !== 2) {
             return res.status(403).json({
@@ -274,13 +274,13 @@ export const getDayReservationStatusController = async (req, res) => {
             });
         }
 
-        if (!mallId) {
+        if (!idMall) {
             return res.status(403).json({
                 message: "No tienes un centro comercial asignado"
             });
         }
 
-        const dayStatus = await getDayReservationStatus(mallId);
+        const dayStatus = await getDayReservationStatus(idMall);
 
         res.json({
             message: "Estado del día obtenido correctamente",

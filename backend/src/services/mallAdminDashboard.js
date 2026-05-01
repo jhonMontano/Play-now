@@ -103,7 +103,6 @@ export const getMallCourts = async (mallId) => {
             attributes: [
                 "id",
                 "nombreCancha",
-                "capacidad",
                 "valorHora",
                 "activo",
                 "createdAt"
@@ -112,12 +111,18 @@ export const getMallCourts = async (mallId) => {
                 {
                     model: Sport,
                     as: "deporte",
-                    attributes: ["nombre"]
+                    attributes: ["nombre", "cantidad"]
                 },
                 {
                     model: Reservation,
                     as: "reservas",
-                    attributes: ["id", "estado", "fechaReserva", "horaReserva", "cantidadHoras"],
+                    attributes: [
+                        "id",
+                        "estado",
+                        "fechaReserva",
+                        "horaReserva",
+                        "cantidadHoras"
+                    ],
                     where: {
                         estado: "Activa"
                     },
@@ -133,21 +138,29 @@ export const getMallCourts = async (mallId) => {
             if (court.reservas && court.reservas.length > 0) {
                 const activeReservation = court.reservas.find(res => {
                     const reservationDate = new Date(res.fechaReserva);
-                    return res.estado === "Activa" && reservationDate.toDateString() === new Date().toDateString();
+
+                    return (
+                        res.estado === "Activa" &&
+                        reservationDate.toDateString() === new Date().toDateString()
+                    );
                 });
-                disponibilidad = activeReservation ? "Ocupada" : "Disponible";
+
+                disponibilidad = activeReservation
+                    ? "Ocupada"
+                    : "Disponible";
             }
 
             return {
                 id: court.id,
                 cancha: court.nombreCancha,
                 deporte: court.deporte?.nombre || "N/A",
-                capacidad: court.capacidad,
-                precioHora: court.valorHora,
+                cantidad: court.deporte?.cantidad || 0,
+                valorHora: court.valorHora,
                 estado: court.activo ? "activo" : "inactivo",
                 disponibilidad
             };
         });
+
     } catch (error) {
         throw new Error(`Error al obtener canchas: ${error.message}`);
     }
@@ -251,7 +264,7 @@ export const getTopCourts = async (mallId) => {
 
         const courtIds = topCourts.map(c => c.courtId);
         const courtsData = await Court.findAll({
-            attributes: ["id", "precioHora"],
+            attributes: ["id", "valorHora"],
             where: { id: courtIds }
         });
 
