@@ -174,9 +174,189 @@
 import express from "express";
 import { authenticateToken } from "../middlewares/authMiddleware.js";
 import { getDashboard } from "../controllers/dashboard.js";
+import {
+    getSuperAdminKPIsController,
+    getRegisteredMallsController,
+    getMallActivityController,
+    getCreatedSportsController,
+    getMallAdministratorsController,
+    getMallAdminKPIsController,
+    getMallCourtsController,
+    getRecentReservationsController,
+    getTopCourtsController,
+    getDayReservationStatusController
+} from "../controllers/dashboardEndpointsController.js";
 
 const router = express.Router();
 
+/**
+ * ================== ENDPOINT ORIGINAL (compatible hacia atrás) ==================
+ */
+
+/**
+ * @swagger
+ * /dashboard:
+ *   get:
+ *     summary: Obtener dashboard completo del usuario
+ *     description: Retorna el dashboard completo según el rol del usuario
+ *     tags: [Dashboard]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Dashboard obtenido correctamente
+ *       401:
+ *         description: No autorizado
+ *       403:
+ *         description: Permiso denegado
+ */
 router.get("/", authenticateToken, getDashboard);
+
+/**
+ * ================== ENDPOINTS SEPARADOS - SUPER ADMINISTRADOR ==================
+ */
+
+/**
+ * @swagger
+ * /dashboard/kpis:
+ *   get:
+ *     summary: KPIs del Super Administrador
+ *     description: Obtiene las métricas principales del sistema
+ *     tags: [Dashboard - Super Admin KPIs]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: KPIs obtenidos correctamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 totalMalls: { type: integer }
+ *                 totalSports: { type: integer }
+ *                 totalActiveCourts: { type: integer }
+ *                 monthReservations: { type: integer }
+ */
+router.get("/kpis", authenticateToken, getSuperAdminKPIsController);
+
+/**
+ * @swagger
+ * /dashboard/malls:
+ *   get:
+ *     summary: Centros Comerciales Registrados
+ *     description: Lista de todos los centros comerciales registrados en el sistema
+ *     tags: [Dashboard - Super Admin Tables]
+ *     security:
+ *       - BearerAuth: []
+ */
+router.get("/malls", authenticateToken, getRegisteredMallsController);
+
+/**
+ * @swagger
+ * /dashboard/activity:
+ *   get:
+ *     summary: Resumen de Actividad por Centro
+ *     description: Información de actividad y desempeño de cada centro
+ *     tags: [Dashboard - Super Admin Tables]
+ *     security:
+ *       - BearerAuth: []
+ */
+router.get("/activity", authenticateToken, getMallActivityController);
+
+/**
+ * @swagger
+ * /dashboard/sports:
+ *   get:
+ *     summary: Deportes Creados
+ *     description: Lista de todos los deportes registrados en el sistema
+ *     tags: [Dashboard - Super Admin Tables]
+ *     security:
+ *       - BearerAuth: []
+ */
+router.get("/sports", authenticateToken, getCreatedSportsController);
+
+/**
+ * @swagger
+ * /dashboard/admins:
+ *   get:
+ *     summary: Administradores de Centros
+ *     description: Lista de administradores de centros comerciales
+ *     tags: [Dashboard - Super Admin Tables]
+ *     security:
+ *       - BearerAuth: []
+ */
+router.get("/admins", authenticateToken, getMallAdministratorsController);
+
+/**
+ * ================== ENDPOINTS SEPARADOS - ADMIN CENTRO COMERCIAL ==================
+ */
+
+/**
+ * @swagger
+ * /dashboard/mall-kpis:
+ *   get:
+ *     summary: KPIs del Centro Comercial
+ *     description: Obtiene las métricas principales del centro asignado
+ *     tags: [Dashboard - Mall Admin KPIs]
+ *     security:
+ *       - BearerAuth: []
+ */
+router.get("/mall-kpis", authenticateToken, getMallAdminKPIsController);
+
+/**
+ * @swagger
+ * /dashboard/my-courts:
+ *   get:
+ *     summary: Mis Canchas
+ *     description: Lista de canchas del centro comercial asignado
+ *     tags: [Dashboard - Mall Admin Tables]
+ *     security:
+ *       - BearerAuth: []
+ */
+router.get("/my-courts", authenticateToken, getMallCourtsController);
+
+/**
+ * @swagger
+ * /dashboard/recent-reservations:
+ *   get:
+ *     summary: Reservas Recientes
+ *     description: Lista de las reservas recientes del centro
+ *     tags: [Dashboard - Mall Admin Tables]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         description: Número máximo de registros a retornar
+ */
+router.get("/recent-reservations", authenticateToken, getRecentReservationsController);
+
+/**
+ * @swagger
+ * /dashboard/top-courts:
+ *   get:
+ *     summary: Top 5 Canchas Más Reservadas
+ *     description: Las 5 canchas con más reservas del mes actual
+ *     tags: [Dashboard - Mall Admin Tables]
+ *     security:
+ *       - BearerAuth: []
+ */
+router.get("/top-courts", authenticateToken, getTopCourtsController);
+
+/**
+ * @swagger
+ * /dashboard/day-status:
+ *   get:
+ *     summary: Estado de Reservas del Día
+ *     description: Estado de todas las reservas del día actual
+ *     tags: [Dashboard - Mall Admin Tables]
+ *     security:
+ *       - BearerAuth: []
+ */
+router.get("/day-status", authenticateToken, getDayReservationStatusController);
 
 export default router;
