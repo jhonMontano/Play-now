@@ -1,35 +1,42 @@
-import { getDashboardService } from "../services/dashboard.js";
+import { getSuperAdminDashboardService } from "../services/superAdminDashboard.js";
+import { getMallAdminDashboardService } from "../services/mallAdminDashboard.js";
 
+/**
+ * Controlador para obtener el dashboard según el rol del usuario
+ * - Rol 1: Super Administrador
+ * - Rol 2: Administrador del Centro Comercial
+ */
 export const getDashboard = async (req, res) => {
     try {
-
         const { idRol, mallId: mallFromToken } = req.user;
-        const { mallId, startDate, endDate, estado, courtId, year } = req.query;
 
-        let finalMallId;
-
-        if (idRol === 2) {
-            finalMallId = mallFromToken;
-        } else if (idRol === 1) {
-            finalMallId = mallId || undefined;
-        } else {
-            return res.status(403).json({
-                message: "No tienes permisos"
+        // Super Administrador (idRol === 1)
+        if (idRol === 1) {
+            const dashboard = await getSuperAdminDashboardService();
+            return res.json({
+                message: "Dashboard de Super Administrador obtenido correctamente",
+                data: dashboard
             });
         }
 
-        const dashboard = await getDashboardService({
-            mallId: finalMallId,
-            startDate,
-            endDate,
-            estado,
-            courtId,
-            year
-        });
+        // Administrador del Centro (idRol === 2)
+        if (idRol === 2) {
+            if (!mallFromToken) {
+                return res.status(403).json({
+                    message: "No tienes un centro comercial asignado"
+                });
+            }
 
-        res.json({
-            message: "Dashboard obtenido correctamente",
-            data: dashboard
+            const dashboard = await getMallAdminDashboardService(mallFromToken);
+            return res.json({
+                message: "Dashboard del Centro obtenido correctamente",
+                data: dashboard
+            });
+        }
+
+        // Otro rol no permitido
+        return res.status(403).json({
+            message: "No tienes permisos para acceder al dashboard"
         });
 
     } catch (error) {
