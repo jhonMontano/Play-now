@@ -17,7 +17,7 @@ const app = express();
 
 app.use(
   cors({
-      origin: ["http://localhost:8080", "https://play-now-xm2c.onrender.com/"],
+      origin: ["http://localhost:8080", "https://play-now-xm2c.onrender.com"],
     credentials: true,
   })
 );
