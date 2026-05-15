@@ -58,8 +58,9 @@ class PaymentService {
         acceptance_token: acceptanceToken,
         payment_method: paymentMethod,
         signature,
+         redirect_url:'https://play-now-xm2c.onrender.com/client/payment-result',
         customer_data: {
-          phone_number: customerData.phone_number || '3001234567',
+          phone_number: customerData.phone_number || '3045491946',
           full_name: customerData.full_name || 'Cliente PlayNow',
         },
       };
@@ -77,6 +78,24 @@ class PaymentService {
         throw new Error(error.response.data.error?.message || JSON.stringify(error.response.data));
       }
       console.error('Error creando transacción:', error.message);
+      throw error;
+    }
+  }
+
+  async getTransactionById(transactionId) {
+    try {
+      const response = await axios.get(`${WOMPI_BASE_URL}/transactions/${transactionId}`, {
+        headers: {
+          Authorization: `Bearer ${WOMPI_PRIVATE_KEY}`,
+        },
+      });
+      return response.data.data;
+    } catch (error) {
+      if (error.response) {
+        console.error('Error consultando transacción:', error.response.status, error.response.data);
+        throw new Error(error.response.data.error?.message || JSON.stringify(error.response.data));
+      }
+      console.error('Error consultando transacción:', error.message);
       throw error;
     }
   }
