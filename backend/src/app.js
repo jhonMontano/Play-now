@@ -12,6 +12,7 @@ import adminStatsRoutes from "./routes/adminStatsRoutes.js";
 import roleRoutes from "./routes/roleRoutes.js";
 import dashboardRoutes from "./routes/dashboardRoutes.js";
 import contactRoutes from "./routes/contactRoutes.js";
+import paymentRoutes from "./routes/paymentRoutes.js";
 
 const app = express();
 
@@ -41,5 +42,6 @@ app.use("/api/contact", contactRoutes);
 app.use("/api/admin/stats", adminStatsRoutes);
 app.use("/api/roles", roleRoutes);
 app.use("/api/admin/dashboard", dashboardRoutes);
+app.use("/api/payments", paymentRoutes);
 
 export default app;
