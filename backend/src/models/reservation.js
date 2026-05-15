@@ -35,6 +35,14 @@ const Reservation = sequelize.define("Reservation", {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
+  payment_id: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  payment_status: {
+    type: DataTypes.ENUM("pending", "approved", "declined", "error"),
+    defaultValue: "pending",
+  },
 });
 
 export default Reservation;
