@@ -120,35 +120,47 @@
 
 /**
  * @swagger
- * /api/payments/webhook:
- *   post:
- *     summary: Recibir notificaciones de webhook de Wompi
+ * /api/payments/transaction/{id}:
+ *   get:
+ *     summary: Consultar estado de transacción por ID
  *     tags: [Payments]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             description: Evento enviado por Wompi
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID de la transacción
  *     responses:
  *       200:
- *         description: Webhook recibido correctamente
+ *         description: Estado de la transacción consultado correctamente
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/WebhookResponse'
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 transaction:
+ *                   type: object
+ *                   description: Datos completos de la transacción
+ *                 paymentUrl:
+ *                   type: string
+ *                   description: URL de pago si está disponible
+ *                   example: "https://registro.pse.com.co/PSENF/index.html?enc=..."
  *       500:
- *         description: Error en el webhook
+ *         description: Error consultando la transacción
  */
 
 import express from 'express';
-import { createPSEPayment, createBancolombiaPayment, handleWebhook } from '../controllers/paymentController.js';
+import { createPSEPayment, createBancolombiaPayment, handleWebhook, getTransactionStatus } from '../controllers/paymentController.js';
 
 const router = express.Router();
 
 router.post('/pse', createPSEPayment);
 router.post('/bancolombia', createBancolombiaPayment);
+router.get('/transaction/:id', getTransactionStatus);
 router.post('/webhook', handleWebhook);
 
 export default router;
