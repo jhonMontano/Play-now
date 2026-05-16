@@ -3,8 +3,10 @@ import Reservation from "../models/reservation.js";
 import Court from "../models/court.js";
 import Mall from "../models/mall.js";
 import User from "../models/user.js";
+import moment from "moment-timezone";
 
 const validarHorarioCancha = (cancha, horaReserva, cantidadHoras, fechaReserva) => {
+
   const [horaInicioH, horaInicioM] = cancha.horarioInicio.split(':').map(Number);
   const [horaFinH, horaFinM] = cancha.horarioFin.split(':').map(Number);
   const [horaReservaH, horaReservaM] = horaReserva.split(':').map(Number);
@@ -15,12 +17,20 @@ const validarHorarioCancha = (cancha, horaReserva, cantidadHoras, fechaReserva) 
   const minutosFinReserva = minutosReserva + (cantidadHoras * 60);
 
   if (minutosReserva < minutosInicio || minutosFinReserva > minutosFin) {
-    throw new Error(`La cancha solo está disponible de ${cancha.horarioInicio} a ${cancha.horarioFin}`);
+    throw new Error(
+      `La cancha solo está disponible de ${cancha.horarioInicio} a ${cancha.horarioFin}`
+    );
   }
 
-  const ahora = new Date();
-  const fechaHoraReserva = new Date(`${fechaReserva}T${horaReserva}`);
-  if (fechaHoraReserva < ahora) {
+  const ahora = moment().tz("America/Bogota");
+
+  const fechaHoraReserva = moment.tz(
+    `${fechaReserva} ${horaReserva}`,
+    "YYYY-MM-DD HH:mm",
+    "America/Bogota"
+  );
+
+  if (fechaHoraReserva.isBefore(ahora)) {
     throw new Error("No se pueden hacer reservas en fechas/horas pasadas");
   }
 
@@ -28,14 +38,29 @@ const validarHorarioCancha = (cancha, horaReserva, cantidadHoras, fechaReserva) 
 };
 
 const validarDiasOperacion = (cancha, fechaReserva) => {
+
   const fecha = new Date(fechaReserva);
-  const diasSemana = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+
+  const diasSemana = [
+    'Domingo',
+    'Lunes',
+    'Martes',
+    'Miércoles',
+    'Jueves',
+    'Viernes',
+    'Sábado'
+  ];
+
   const diaReserva = diasSemana[fecha.getDay()];
 
-  const diasDisponibles = cancha.diasDisponibles.split(',').map(dia => dia.trim());
+  const diasDisponibles = cancha.diasDisponibles
+    .split(',')
+    .map(dia => dia.trim());
 
   if (!diasDisponibles.includes(diaReserva)) {
-    throw new Error(`La cancha no opera los ${diaReserva}. Días disponibles: ${cancha.diasDisponibles}`);
+    throw new Error(
+      `La cancha no opera los ${diaReserva}. Días disponibles: ${cancha.diasDisponibles}`
+    );
   }
 
   return true;
@@ -52,8 +77,8 @@ export const createReservationService = async (user, data) => {
     throw new Error("Los campos 'courtId', 'fechaReserva', 'horaReserva' y 'cantidadHoras' son obligatorios");
   }
 
-  if (!/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/.test(horaReserva)) {
-    throw new Error("Formato de hora inválido. Use HH:MM (24 horas)");
+  if (!/^([0-1]?[0-9]|2[0-3]):00$/.test(horaReserva)) {
+    throw new Error("La hora debe ser exacta. Ejemplo: 03:00, 04:00, 15:00");
   }
 
   if (cantidadHoras < 1 || cantidadHoras > 8) {
