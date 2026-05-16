@@ -74,7 +74,7 @@ export const getRegisteredMalls = async () => {
                 ? `${mall.administrador.primerNombre || ""} ${mall.administrador.primerApellido || ""}`.trim()
                 : "N/A",
             canchas: mall.canchas?.length || 0,
-            estado: mall.activo ? "activo" : "inactivo",
+            activo: mall.activo,
             fechaRegistro: mall.createdAt
         }));
     } catch (error) {
@@ -169,8 +169,8 @@ export const getCreatedSports = async () => {
         return sports.map(sport => ({
             id: sport.id,
             deporte: sport.nombre,
-            Descripción: sport.descripcion || "N/A",
-            estado: sport.activo ? "activo" : "inactivo",
+            descripción: sport.descripcion || "N/A",
+            activo: sport.activo,
             canchasAsociadas: sport.canchas?.length || 0
         }));
     } catch (error) {
@@ -232,4 +232,5 @@ export const getSuperAdminDashboardService = async () => {
     } catch (error) {
         throw new Error(`Error al obtener dashboard del Super Administrador: ${error.message}`);
     }
+
 };

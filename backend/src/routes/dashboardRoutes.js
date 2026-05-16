@@ -232,9 +232,9 @@
  *         canchas:
  *           type: integer
  *           example: 2
- *         estado:
- *           type: string
- *           example: activo
+ *         activo:
+ *           type: boolean
+ *           example: true
  *         fechaRegistro:
  *           type: string
  *           format: date-time
@@ -275,9 +275,9 @@
  *         Descripción:
  *           type: string
  *           example: Deporte de equipo jugado en una cancha rectangular
- *         estado:
- *           type: string
- *           example: activo
+ *         activo:
+ *           type: boolean
+ *           example: true
  *         canchasAsociadas:
  *           type: integer
  *           example: 5
