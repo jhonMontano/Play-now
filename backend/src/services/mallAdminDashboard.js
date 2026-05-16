@@ -89,7 +89,9 @@ export const getMallAdminKPIs = async (mallId) => {
             totalCourts,
             todayReservations,
             monthReservations,
-            availableCourtNow: availableCourts || 0
+            availableCourtNow: Array.isArray(availableCourts)
+                ? availableCourts.length
+                : availableCourts || 0
         };
     } catch (error) {
         throw new Error(`Error al obtener KPIs del admin: ${error.message}`);
@@ -274,7 +276,7 @@ export const getTopCourts = async (mallId) => {
         });
 
         return topCourts.map(court => {
-            const hoursInMonth = 24 * 30; 
+            const hoursInMonth = 24 * 30;
             const occupationPercentage = ((Number(court.horasOcupadas) || 0) / hoursInMonth * 100).toFixed(2);
 
             return {

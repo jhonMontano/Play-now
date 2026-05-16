@@ -213,6 +213,95 @@
  *         estado:
  *           type: string
  *           example: Activa
+ *
+ *     MallItem:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: integer
+ *           example: 2
+ *         centroComercial:
+ *           type: string
+ *           example: Mayorca
+ *         ciudad:
+ *           type: string
+ *           example: Itagüí
+ *         adminAsignado:
+ *           type: string
+ *           example: Jhon Sanchez
+ *         canchas:
+ *           type: integer
+ *           example: 2
+ *         estado:
+ *           type: string
+ *           example: activo
+ *         fechaRegistro:
+ *           type: string
+ *           format: date-time
+ *           example: 2026-04-29T03:19:03.618Z
+ *
+ *     ActivityItem:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: integer
+ *           example: 1
+ *         centroComercial:
+ *           type: string
+ *           example: CC Santafe
+ *         canchasTotal:
+ *           type: integer
+ *           example: 1
+ *         reservasEsteMes:
+ *           type: integer
+ *           example: 24
+ *         ingresosEstimados:
+ *           type: number
+ *           format: float
+ *           example: 540000
+ *         admin:
+ *           type: string
+ *           example: Carlos Ramírez
+ *
+ *     SportItem:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: integer
+ *           example: 1
+ *         deporte:
+ *           type: string
+ *           example: Fútbol
+ *         Descripción:
+ *           type: string
+ *           example: Deporte de equipo jugado en una cancha rectangular
+ *         estado:
+ *           type: string
+ *           example: activo
+ *         canchasAsociadas:
+ *           type: integer
+ *           example: 5
+ *
+ *     AdminItem:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: integer
+ *           example: 52
+ *         nombre:
+ *           type: string
+ *           example: Carlos Gómez López
+ *         correo:
+ *           type: string
+ *           format: email
+ *           example: admin@plaza.com
+ *         centroAsignado:
+ *           type: string
+ *           example: Plaza Central
+ *         fechaCreacion:
+ *           type: string
+ *           format: date-time
+ *           example: 2026-04-29T02:58:58.773Z
  */
 
 /**
@@ -596,103 +685,19 @@
 
 /**
  * @swagger
- * components:
- *   schemas:
- *     MallItem:
- *       type: object
- *       properties:
- *         id:
- *           type: integer
- *           example: 1
- *         nombreCentro:
- *           type: string
- *           example: Plaza Central
- *         ciudad:
- *           type: string
- *           example: Medellín
- *         totalCanchas:
- *           type: integer
- *           example: 15
- *         activo:
- *           type: boolean
- *           example: true
- *
- *     ActivityItem:
- *       type: object
- *       properties:
- *         id:
- *           type: integer
- *           example: 1
- *         nombreCentro:
- *           type: string
- *           example: Plaza Central
- *         ciudad:
- *           type: string
- *           example: Medellín
- *         reservasEstaSemanA:
- *           type: integer
- *           example: 24
- *         ingresos:
- *           type: number
- *           format: float
- *           example: 540000
- *         administrador:
- *           type: string
- *           example: Carlos Gómez
- *
- *     SportItem:
- *       type: object
- *       properties:
- *         id:
- *           type: integer
- *           example: 1
- *         deporte:
- *           type: string
- *           example: Fútbol
- *         totalCanchas:
- *           type: integer
- *           example: 5
- *         malls:
- *           type: integer
- *           example: 3
- *         activo:
- *           type: boolean
- *           example: true
- *
- *     AdminItem:
- *       type: object
- *       properties:
- *         id:
- *           type: integer
- *           example: 52
- *         nombre:
- *           type: string
- *           example: Carlos Gómez López
- *         correo:
- *           type: string
- *           format: email
- *           example: admin@plaza.com
- *         mall:
- *           type: string
- *           example: Plaza Central
- *         ciudad:
- *           type: string
- *           example: Medellín
- *         celular:
- *           type: string
- *           example: 3001234567
- *         activo:
- *           type: boolean
- *           example: true
- */
-
-/**
- * @swagger
  * /api/admin/dashboard/malls:
  *   get:
  *     summary: Obtener centros comerciales registrados
  *     description: |
  *       **[SUPER ADMIN ONLY]** Retorna lista de todos los centros comerciales registrados en el sistema
+ *       
+ *       Información incluida:
+ *       - ID y nombre del centro comercial
+ *       - Ciudad y ubicación
+ *       - Administrador asignado
+ *       - Cantidad de canchas
+ *       - Estado (activo/inactivo)
+ *       - Fecha de registro
  *       
  *       Permisos:
  *       - Requerido: idRol = 1 (Super Admin)
@@ -710,7 +715,7 @@
  *               properties:
  *                 message:
  *                   type: string
- *                   example: Centros comerciales obtenidos correctamente
+ *                   example: Centros comerciales registrados obtenidos correctamente
  *                 data:
  *                   type: array
  *                   items:
@@ -730,7 +735,7 @@
  *               properties:
  *                 message:
  *                   type: string
- *                   example: No tienes permisos para acceder a este recurso
+ *                   example: No tienes permisos para acceder a esta información
  *       500:
  *         description: Error interno del servidor
  *         content:
@@ -743,13 +748,15 @@
  * @swagger
  * /api/admin/dashboard/activity:
  *   get:
- *     summary: Obtener actividad de centros comerciales
+ *     summary: Obtener resumen de actividad por centro comercial
  *     description: |
- *       **[SUPER ADMIN ONLY]** Retorna estadísticas de actividad (reservas e ingresos) de todos los centros
+ *       **[SUPER ADMIN ONLY]** Retorna estadísticas de actividad (reservas e ingresos) de todos los centros del mes actual
  *       
  *       Información incluida:
- *       - Reservas de esta semana
- *       - Ingresos totales
+ *       - Nombre del centro comercial
+ *       - Total de canchas
+ *       - Reservas realizadas en el mes
+ *       - Ingresos estimados del mes
  *       - Administrador responsable
  *       
  *       Permisos:
@@ -768,7 +775,7 @@
  *               properties:
  *                 message:
  *                   type: string
- *                   example: Actividad de centros comerciales obtenida correctamente
+ *                   example: Resumen de actividad por centro obtenido correctamente
  *                 data:
  *                   type: array
  *                   items:
@@ -788,7 +795,7 @@
  *               properties:
  *                 message:
  *                   type: string
- *                   example: No tienes permisos para acceder a este recurso
+ *                   example: No tienes permisos para acceder a esta información
  *       500:
  *         description: Error interno del servidor
  *         content:
@@ -806,9 +813,10 @@
  *       **[SUPER ADMIN ONLY]** Retorna lista de todos los deportes registrados y estadísticas
  *       
  *       Información incluida:
- *       - Total de canchas por deporte
- *       - Cantidad de malls que ofrecen el deporte
+ *       - ID y nombre del deporte
+ *       - Descripción del deporte
  *       - Estado (activo/inactivo)
+ *       - Cantidad de canchas asociadas
  *       
  *       Permisos:
  *       - Requerido: idRol = 1 (Super Admin)
@@ -846,7 +854,7 @@
  *               properties:
  *                 message:
  *                   type: string
- *                   example: No tienes permisos para acceder a este recurso
+ *                   example: No tienes permisos para acceder a esta información
  *       500:
  *         description: Error interno del servidor
  *         content:
@@ -861,13 +869,13 @@
  *   get:
  *     summary: Obtener administradores de centros comerciales
  *     description: |
- *       **[SUPER ADMIN ONLY]** Retorna lista de todos los administradores de centros comerciales
+ *       **[SUPER ADMIN ONLY]** Retorna lista de todos los administradores de centros comerciales registrados
  *       
  *       Información incluida:
- *       - Datos personales del administrador
+ *       - ID y nombre del administrador
+ *       - Correo electrónico de contacto
  *       - Centro comercial asignado
- *       - Información de contacto
- *       - Estado (activo/inactivo)
+ *       - Fecha de creación de la cuenta
  *       
  *       Permisos:
  *       - Requerido: idRol = 1 (Super Admin)
@@ -905,7 +913,7 @@
  *               properties:
  *                 message:
  *                   type: string
- *                   example: No tienes permisos para acceder a este recurso
+ *                   example: No tienes permisos para acceder a esta información
  *       500:
  *         description: Error interno del servidor
  *         content:
