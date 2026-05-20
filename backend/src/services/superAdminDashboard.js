@@ -181,7 +181,7 @@ export const getCreatedSports = async () => {
 export const getMallAdministrators = async () => {
     try {
         const admins = await User.findAll({
-            attributes: ["id", "primerNombre", "primerApellido", "correo", "idMall", "createdAt"],
+            attributes: ["id", "primerNombre", "primerApellido", "correo", "activo", "idMall", "createdAt"],
             include: [
                 {
                     model: Roles,
@@ -205,6 +205,7 @@ export const getMallAdministrators = async () => {
             nombre: `${admin.primerNombre || ""} ${admin.primerApellido || ""}`.trim(),
             correo: admin.correo,
             centroAsignado: admin.mallAdministrado?.nombreCentro || "Sin asignar",
+            estado: admin.activo,
             fechaCreacion: admin.createdAt
         }));
     } catch (error) {
