@@ -1,4 +1,4 @@
-import { createTransporter } from "../utils/mailer.js";
+/*import { createTransporter } from "../utils/mailer.js";
 import { sendContactFormEmailTemplate } from "../utils/emailContact.js";
 
 export const sendContactFormEmail = async ({ nombre, email, tipo, mensaje }) => {
@@ -13,4 +13,44 @@ export const sendContactFormEmail = async ({ nombre, email, tipo, mensaje }) => 
 
   console.log("Enviando correo de contacto a:", mailOptions.to);
   await transporter.sendMail(mailOptions);
+};*/
+
+/*import { createTransporter } from "../utils/mailer.js";
+import { sendContactFormEmailTemplate } from "../utils/emailContact.js";
+
+export const sendContactFormEmail = async ({ nombre, email, tipo, mensaje }) => {
+  const transporter = createTransporter();
+  const mailOptions = sendContactFormEmailTemplate({ nombre, email, tipo, mensaje });
+
+  try {
+    await transporter.verify();
+  } catch (error) {
+    throw new Error(`Error de conexión SMTP: ${error.message}`);
+  }
+
+  console.log("Enviando correo de contacto a:", mailOptions.to);
+  await transporter.sendMail(mailOptions);
+};*/
+
+import { sendEmail } from "../utils/mailer.js";
+import { sendContactFormEmailTemplate } from "../utils/emailContact.js";
+
+export const sendContactFormEmail = async ({
+  nombre,
+  email,
+  tipo,
+  mensaje,
+}) => {
+
+  const mailOptions = sendContactFormEmailTemplate({
+    nombre,
+    email,
+    tipo,
+    mensaje,
+  });
+
+  console.log("Enviando correo de contacto a:", mailOptions.to);
+
+  await sendEmail(mailOptions);
 };
+
