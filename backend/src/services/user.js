@@ -54,7 +54,7 @@ export const sendPasswordResetEmail = async (email) => {
 
   const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: "1h" });
 
-  const resetLink = `${process.env.FRONTEND_URL}/users/reset-password/${token}`;
+  const resetLink = `${process.env.FRONTEND_URL_PROD}/users/reset-password/${token}`;
 
   const transporter = createTransporter(); 
   const mailOptions = sendResetPasswordEmail(email, resetLink);
