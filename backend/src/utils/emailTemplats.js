@@ -1,5 +1,5 @@
 export const sendResetPasswordEmail = (email, resetLink) => ({
-  from: process.env.EMAIL_USER,
+  from: 'admonplaynow@gmail.com', //process.env.EMAIL_USER,
   to: email,
   subject: "🔐 Recuperación de contraseña - PlayNow",
   html: `
