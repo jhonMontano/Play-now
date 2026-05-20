@@ -18,32 +18,22 @@ export const createTransporter = () => {
   return transporter;
 };*/
 
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 
-export const createTransporter = () => {
-  const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 465,
-    secure: true,
-    auth: {
-      user: "admonplaynow@gmail.com",
-      pass: "haygsyqysncjylgt",
-    },
-    tls: {
-      rejectUnauthorized: false,
-    },
-    connectionTimeout: 15000,
-    greetingTimeout: 15000,
-    socketTimeout: 15000,
-  });
+const resend = new Resend(process.env.RESEND_API_KEY);
 
-  transporter.verify()
-    .then(() => {
-      console.log("SMTP OK");
-    })
-    .catch((error) => {
-      console.error("SMTP ERROR", error);
+export const sendEmail = async ({ to, subject, html }) => {
+  try {
+    const response = await resend.emails.send({
+      from: "onboarding@resend.dev",
+      to,
+      subject,
+      html,
     });
 
-  return transporter;
+    console.log("Correo enviado:", response);
+
+  } catch (error) {
+    console.error("Error enviando correo:", error);
+  }
 };
