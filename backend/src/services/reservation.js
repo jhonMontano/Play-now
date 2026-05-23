@@ -164,11 +164,11 @@ export const createReservationService = async (user, data) => {
         }
       );
 
-    newReservation.payment_id =
-      transaction.id;
+    newReservation.payment_id = transaction.id;
 
-    newReservation.payment_status =
-      transaction.status.toLowerCase();
+    newReservation.payment_reference = transaction.reference;
+
+    newReservation.payment_status = transaction.status;
 
     await newReservation.save();
 
@@ -176,6 +176,8 @@ export const createReservationService = async (user, data) => {
       message: "Reserva creada exitosamente",
       reserva: newReservation,
       transaction,
+      paymentUrl:
+        transaction?.payment_method?.extra?.async_payment_url
     };
 
   } catch (error) {
