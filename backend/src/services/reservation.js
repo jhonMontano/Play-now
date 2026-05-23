@@ -4,6 +4,7 @@ import Court from "../models/court.js";
 import Mall from "../models/mall.js";
 import User from "../models/user.js";
 import moment from "moment-timezone";
+import paymentService from "./paymentService.js";
 
 const validarHorarioCancha = (cancha, horaReserva, cantidadHoras, fechaReserva) => {
 
@@ -141,13 +142,54 @@ export const createReservationService = async (user, data) => {
     horaReserva,
     cantidadHoras,
     valorTotal,
+
+    payment_status: "pending",
   });
 
-  return {
-    message: "Reserva creada exitosamente",
-    reserva: newReservation,
-  };
-};;
+  try {
+
+    const transaction =
+      await paymentService.createBancolombiaTransaction(
+        valorTotal,
+        "COP",
+        user.correo,
+        `ref-${newReservation.id}`,
+        0,
+        user.numeroDocumento,
+        "CC",
+        {
+          phone_number: user.celular,
+          full_name:
+            `${user.primerNombre} ${user.primerApellido}`,
+        }
+      );
+
+    newReservation.payment_id =
+      transaction.id;
+
+    newReservation.payment_status =
+      transaction.status.toLowerCase();
+
+    await newReservation.save();
+
+    return {
+      message: "Reserva creada exitosamente",
+      reserva: newReservation,
+      transaction,
+    };
+
+  } catch (error) {
+
+    console.error(
+      "Error creando pago:",
+      error
+    );
+
+    throw new Error(
+      "Error creando el pago en Wompi"
+    );
+  }
+};
 
 export const getReservationsService = async (user) => {
   if (user.idRol === 3) {
