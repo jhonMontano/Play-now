@@ -32,38 +32,34 @@ export const handleWebhookService =
 
             case 'APPROVED':
 
-                reservation.payment_status =
-                    'approved';
+                /*reservation.payment_status =
+                    'approved';*/
 
-                reservation.estado =
-                    'Activa';
+                reservation.estado = 'Activa';
 
                 break;
 
             case 'DECLINED':
 
-                reservation.payment_status =
-                    'declined';
+                /*reservation.payment_status =
+                    'declined';*/
 
-                reservation.estado =
-                    'Cancelada';
+                reservation.estado = 'Cancelada';
 
                 break;
 
             case 'ERROR':
 
-                reservation.payment_status =
-                    'error';
+                reservation.payment_status = 'error';
 
-                reservation.estado =
-                    'Cancelada';
+                reservation.estado = 'Cancelada';
 
                 break;
 
             case 'PENDING':
 
                 reservation.payment_status =
-                    'pending';
+                    'PENDING';
 
                 break;
         }
