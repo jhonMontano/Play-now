@@ -180,6 +180,16 @@ export const createReservationService = async (user, data) => {
         transaction?.payment_method?.extra?.async_payment_url
     };
 
+    console.log(
+      "TRANSACCION WOMPI:",
+      JSON.stringify(transaction, null, 2)
+    );
+
+    console.log(
+      "PAYMENT URL:",
+      transaction?.payment_method?.extra?.async_payment_url
+    );
+
   } catch (error) {
 
     console.error(
