@@ -147,7 +147,6 @@ export const createReservationService = async (user, data) => {
   });
 
   try {
-
     const transaction =
       await paymentService.createBancolombiaTransaction(
         valorTotal,
@@ -164,14 +163,6 @@ export const createReservationService = async (user, data) => {
         }
       );
 
-    newReservation.payment_id = transaction.id;
-
-    newReservation.payment_reference = transaction.reference;
-
-    newReservation.payment_status = transaction.status.toLowerCase();;
-
-    await newReservation.save();
-
     console.log(
       "TRANSACCION WOMPI:",
       JSON.stringify(transaction, null, 2)
@@ -181,6 +172,16 @@ export const createReservationService = async (user, data) => {
       "PAYMENT URL:",
       transaction?.payment_method?.extra?.async_payment_url
     );
+
+    newReservation.payment_id = transaction.id;
+
+    newReservation.payment_reference =
+      transaction.reference;
+
+    newReservation.payment_status =
+      transaction.status.toLowerCase();
+
+    await newReservation.save();
 
     return {
       message: "Reserva creada exitosamente",
