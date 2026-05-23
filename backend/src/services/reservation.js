@@ -169,6 +169,11 @@ export const createReservationService = async (user, data) => {
       JSON.stringify(transaction, null, 2)
     );
 
+    // ESPERAR A QUE WOMPI GENERE EL async_payment_url
+    await new Promise(resolve =>
+      setTimeout(resolve, 5000)
+    );
+
     // CONSULTAR TRANSACCION COMPLETA
     const transactionDetail =
       await paymentService.getTransactionById(
