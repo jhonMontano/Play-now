@@ -164,16 +164,32 @@ export const createReservationService = async (user, data) => {
       );
 
     console.log(
-      "TRANSACCION WOMPI:",
+      "TRANSACCION CREADA:",
       JSON.stringify(transaction, null, 2)
     );
 
+    // CONSULTAR LA TRANSACCION COMPLETA
+    const transactionDetails =
+      await paymentService.getTransactionById(
+        transaction.id
+      );
+
     console.log(
-      "PAYMENT URL:",
-      transaction?.payment_method?.extra?.async_payment_url
+      "DETALLE TRANSACCION:",
+      JSON.stringify(transactionDetails, null, 2)
     );
 
-    newReservation.payment_id = transaction.id;
+    // SACAR URL DEL PAGO
+    const paymentUrl =
+      transactionDetails?.payment_method?.extra?.async_payment_url;
+
+    console.log(
+      "PAYMENT URL:",
+      paymentUrl
+    );
+
+    newReservation.payment_id =
+      transaction.id;
 
     newReservation.payment_reference =
       transaction.reference;
@@ -186,9 +202,8 @@ export const createReservationService = async (user, data) => {
     return {
       message: "Reserva creada exitosamente",
       reserva: newReservation,
-      transaction,
-      paymentUrl:
-        transaction?.payment_method?.extra?.async_payment_url
+      transaction: transactionDetails,
+      paymentUrl
     };
 
   } catch (error) {
