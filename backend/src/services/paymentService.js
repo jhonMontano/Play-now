@@ -296,21 +296,17 @@ class PaymentService {
   ) {
 
     const paymentMethod = {
+      type: 'BANCOLOMBIA_TRANSFER',
 
-      type:
-        'BANCOLOMBIA_TRANSFER',
+      sandbox_status: 'APPROVED',
 
-      user_type:
-        this.mapUserType(userType),
+      user_type: this.mapUserType(userType),
 
-      user_legal_id:
-        userLegalId,
+      user_legal_id: userLegalId,
 
-      user_legal_id_type:
-        userLegalIdType,
+      user_legal_id_type: userLegalIdType,
 
-      payment_description:
-        'Reserva de cancha PlayNow',
+      payment_description: 'Reserva de cancha PlayNow',
     };
 
     return this.createTransaction(
