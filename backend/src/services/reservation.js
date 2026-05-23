@@ -172,14 +172,6 @@ export const createReservationService = async (user, data) => {
 
     await newReservation.save();
 
-    return {
-      message: "Reserva creada exitosamente",
-      reserva: newReservation,
-      transaction,
-      paymentUrl:
-        transaction?.payment_method?.extra?.async_payment_url
-    };
-
     console.log(
       "TRANSACCION WOMPI:",
       JSON.stringify(transaction, null, 2)
@@ -189,6 +181,14 @@ export const createReservationService = async (user, data) => {
       "PAYMENT URL:",
       transaction?.payment_method?.extra?.async_payment_url
     );
+
+    return {
+      message: "Reserva creada exitosamente",
+      reserva: newReservation,
+      transaction,
+      paymentUrl:
+        transaction?.payment_method?.extra?.async_payment_url
+    };
 
   } catch (error) {
 
