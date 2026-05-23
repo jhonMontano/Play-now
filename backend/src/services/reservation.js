@@ -181,12 +181,14 @@ export const createReservationService = async (user, data) => {
   } catch (error) {
 
     console.error(
-      "Error creando pago:",
-      error
+      "ERROR WOMPI:",
+      error.response?.data || error.message
     );
 
     throw new Error(
-      "Error creando el pago en Wompi"
+      JSON.stringify(
+        error.response?.data || error.message
+      )
     );
   }
 };
