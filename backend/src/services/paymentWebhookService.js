@@ -32,8 +32,7 @@ export const handleWebhookService =
 
             case 'APPROVED':
 
-                /*reservation.payment_status =
-                    'approved';*/
+                reservation.payment_status = 'approved';
 
                 reservation.estado = 'Activa';
 
@@ -41,8 +40,7 @@ export const handleWebhookService =
 
             case 'DECLINED':
 
-                /*reservation.payment_status =
-                    'declined';*/
+                reservation.payment_status = 'declined';
 
                 reservation.estado = 'Cancelada';
 
@@ -58,8 +56,7 @@ export const handleWebhookService =
 
             case 'PENDING':
 
-                reservation.payment_status =
-                    'PENDING';
+                reservation.payment_status = 'pending';
 
                 break;
         }
