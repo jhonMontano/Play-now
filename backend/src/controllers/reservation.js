@@ -6,14 +6,24 @@ import {
   getReservationsByCourtService,
   updateReservationService,
   cancelReservationService,
-} from "../services/reservation.js"; 
+} from "../services/reservation.js";
 
 export const createReservation = async (req, res) => {
   try {
-    const result = await createReservationService(req.user, req.body);
+
+    const result =
+      await createReservationService(
+        req.user,
+        req.body
+      );
+
     res.status(201).json(result);
+
   } catch (error) {
-    res.status(400).json({ message: error.message });
+
+    res.status(400).json({
+      message: error.message,
+    });
   }
 };
 
