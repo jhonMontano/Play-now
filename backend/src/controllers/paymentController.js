@@ -1,5 +1,6 @@
 import paymentService from '../services/paymentService.js';
 import Reservation from '../models/reservation.js';
+import { handleWebhookService } from '../services/paymentWebhookService.js';
 
 const extractPaymentUrl = (transaction) => {
   return transaction?.payment_method?.extra?.async_payment_url
@@ -89,34 +90,27 @@ const createBancolombiaPayment = async (req, res) => {
 };
 
 const handleWebhook = async (req, res) => {
+
   try {
-    const event = req.body;
 
-    if (event.event === 'transaction.updated') {
-      const transaction = event.data.transaction;
+    await handleWebhookService(
+      req.body
+    );
 
-      // Buscar la reserva por payment_id (reference)
-      const reservation = await Reservation.findOne({ where: { payment_id: transaction.reference } });
+    res.status(200).json({
+      received: true,
+    });
 
-      if (reservation) {
-        if (transaction.status === 'APPROVED') {
-          reservation.payment_status = 'approved';
-          reservation.estado = 'Activa'; // o Completada si es el caso
-        } else if (transaction.status === 'DECLINED') {
-          reservation.payment_status = 'declined';
-          reservation.estado = 'Cancelada';
-        } else if (transaction.status === 'ERROR') {
-          reservation.payment_status = 'error';
-        }
-
-        await reservation.save();
-      }
-    }
-
-    res.status(200).json({ received: true });
   } catch (error) {
-    console.error('Error en webhook:', error);
-    res.status(500).json({ error: 'Webhook error' });
+
+    console.error(
+      'Error en webhook:',
+      error
+    );
+
+    res.status(500).json({
+      error: 'Webhook error',
+    });
   }
 };
 
