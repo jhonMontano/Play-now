@@ -168,7 +168,7 @@ export const createReservationService = async (user, data) => {
 
     newReservation.payment_reference = transaction.reference;
 
-    newReservation.payment_status = transaction.status;
+    newReservation.payment_status = transaction.status.toLowerCase();;
 
     await newReservation.save();
 
