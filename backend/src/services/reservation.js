@@ -147,6 +147,7 @@ export const createReservationService = async (user, data) => {
   });
 
   try {
+
     const transaction =
       await paymentService.createBancolombiaTransaction(
         valorTotal,
@@ -168,23 +169,23 @@ export const createReservationService = async (user, data) => {
       JSON.stringify(transaction, null, 2)
     );
 
-    // CONSULTAR LA TRANSACCION COMPLETA
-    const transactionDetails =
+    // CONSULTAR TRANSACCION COMPLETA
+    const transactionDetail =
       await paymentService.getTransactionById(
         transaction.id
       );
 
     console.log(
       "DETALLE TRANSACCION:",
-      JSON.stringify(transactionDetails, null, 2)
+      JSON.stringify(transactionDetail, null, 2)
     );
 
-    // SACAR URL DEL PAGO
+    // OBTENER URL DE PAGO
     const paymentUrl =
-      transactionDetails?.payment_method?.extra?.async_payment_url;
+      transactionDetail?.payment_method?.extra?.async_payment_url;
 
     console.log(
-      "PAYMENT URL:",
+      "PAYMENT URL FINAL:",
       paymentUrl
     );
 
@@ -202,7 +203,7 @@ export const createReservationService = async (user, data) => {
     return {
       message: "Reserva creada exitosamente",
       reserva: newReservation,
-      transaction: transactionDetails,
+      transaction: transactionDetail,
       paymentUrl
     };
 
