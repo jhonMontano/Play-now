@@ -5,6 +5,7 @@ import Mall from "../models/mall.js";
 import User from "../models/user.js";
 import moment from "moment-timezone";
 import paymentService from "./paymentService.js";
+import sequelize from "../config/database.js";
 
 const validarHorarioCancha = (cancha, horaReserva, cantidadHoras, fechaReserva) => {
 
@@ -68,6 +69,9 @@ const validarDiasOperacion = (cancha, fechaReserva) => {
 };
 
 export const createReservationService = async (user, data) => {
+
+  const t = await sequelize.transaction();
+
   const { courtId, fechaReserva, horaReserva, cantidadHoras } = data;
 
   if (user.idRol !== 3) {
@@ -142,8 +146,9 @@ export const createReservationService = async (user, data) => {
     horaReserva,
     cantidadHoras,
     valorTotal,
-
     payment_status: "pending",
+  }, {
+    transaction: t
   });
 
   try {
@@ -194,6 +199,13 @@ export const createReservationService = async (user, data) => {
       paymentUrl
     );
 
+    if (!paymentUrl) {
+
+      throw new Error(
+        "No fue posible generar el link de pago Bancolombia"
+      );
+    }
+
     newReservation.payment_id =
       transaction.id;
 
@@ -203,7 +215,11 @@ export const createReservationService = async (user, data) => {
     newReservation.payment_status =
       transaction.status.toLowerCase();
 
-    await newReservation.save();
+    await newReservation.save({
+      transaction: t
+    });
+
+    await t.commit();
 
     return {
       message: "Reserva creada exitosamente",
@@ -213,6 +229,8 @@ export const createReservationService = async (user, data) => {
     };
 
   } catch (error) {
+
+    await t.rollback();
 
     console.error(
       "ERROR WOMPI:",
