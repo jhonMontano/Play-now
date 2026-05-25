@@ -263,7 +263,7 @@ export const getReservationsService = async (user) => {
           ]
         }
       ],
-      order: [["fechaReserva", "DESC"], ["horaReserva", "ASC"]],
+      order: [["id", "DESC"]],
     });
   }
 
@@ -293,7 +293,7 @@ export const getReservationsService = async (user) => {
           attributes: ["id", "primerNombre", "primerApellido", "correo", "celular", "numeroDocumento"]
         }
       ],
-      order: [["fechaReserva", "DESC"], ["horaReserva", "ASC"]],
+      order: [["id", "DESC"]],
     });
   }
 
@@ -318,7 +318,7 @@ export const getReservationsService = async (user) => {
           attributes: ["id", "primerNombre", "primerApellido", "correo", "celular"]
         }
       ],
-      order: [["fechaReserva", "DESC"], ["horaReserva", "ASC"]],
+      order: [["id", "DESC"]],
     });
   }
 
@@ -355,7 +355,7 @@ export const getReservationsByMallService = async (user, mallId) => {
         attributes: ["id", "primerNombre", "primerApellido", "correo", "celular", "numeroDocumento"]
       }
     ],
-    order: [["fechaReserva", "DESC"], ["horaReserva", "ASC"]],
+    order: [["id", "DESC"]],
   });
 
   return reservas;
@@ -419,7 +419,7 @@ export const getReservationsByCourtService = async (user, courtId) => {
         attributes: ["id", "primerNombre", "primerApellido", "correo", "celular", "numeroDocumento"]
       }
     ],
-    order: [["fechaReserva", "DESC"], ["horaReserva", "ASC"]]
+    order: [["id", "DESC"]]
   });
 
   return reservas;
