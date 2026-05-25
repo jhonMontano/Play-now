@@ -716,12 +716,16 @@
 
 import { Router } from "express";
 import multer from "multer";
+import fs from "fs";
+import path from "path";
+
 import { authenticateToken } from "../middlewares/authMiddleware.js";
+
 import {
-  createCourt, 
-  getCourts, 
-  getCourtById, 
-  updateCourt, 
+  createCourt,
+  getCourts,
+  getCourtById,
+  updateCourt,
   deleteCourt,
   getCourtsByMallId,
   statusCourt,
@@ -731,33 +735,64 @@ import {
 
 const router = Router();
 
+// RUTA ABSOLUTA
+const uploadPath = path.resolve("uploads");
+
+// CREAR CARPETA SI NO EXISTE
+if (!fs.existsSync(uploadPath)) {
+  fs.mkdirSync(uploadPath, { recursive: true });
+}
+
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, "uploads/"),
+
+  destination: (req, file, cb) => {
+    cb(null, uploadPath);
+  },
+
   filename: (req, file, cb) => {
-    const uniqueName = Date.now() + "-" + file.originalname;
+
+    const uniqueName =
+      Date.now() + "-" + file.originalname;
+
     cb(null, uniqueName);
   }
+
 });
 
 const upload = multer({
+
   storage,
+
   fileFilter: (req, file, cb) => {
-    const allowed = ["image/jpeg", "image/png", "application/pdf"];
+
+    const allowed = [
+      "image/jpeg",
+      "image/png",
+      "application/pdf"
+    ];
+
     if (!allowed.includes(file.mimetype)) {
-      return cb(new Error("Formato no permitido. Solo .jpg, .png y .pdf"));
+
+      return cb(
+        new Error(
+          "Formato no permitido. Solo .jpg, .png y .pdf"
+        )
+      );
     }
+
     cb(null, true);
   }
+
 });
 
 router.post("/", authenticateToken, upload.single("imagen"), createCourt);
 router.get("/", authenticateToken, getCourts);
-router.get("/active", authenticateToken, getActiveCourts);
-router.get("/active/mall/:mallId", authenticateToken, getActiveCourtsByMallId);
-router.get("/mall/:mallId", authenticateToken, getCourtsByMallId); 
-router.get("/:id", authenticateToken, getCourtById);
-router.put("/:id", authenticateToken, upload.single("imagen"), updateCourt);
-router.patch("/:id/status", authenticateToken, statusCourt);
-router.delete("/:id", authenticateToken, deleteCourt);
+router.get("/active",authenticateToken,getActiveCourts);
+router.get("/active/mall/:mallId",authenticateToken,getActiveCourtsByMallId);
+router.get("/mall/:mallId",authenticateToken,getCourtsByMallId);
+router.get("/:id",authenticateToken,getCourtById);
+router.put("/:id",authenticateToken,upload.single("imagen"),updateCourt);
+router.patch("/:id/status",authenticateToken,statusCourt);
+router.delete("/:id",authenticateToken,deleteCourt);
 
 export default router;
