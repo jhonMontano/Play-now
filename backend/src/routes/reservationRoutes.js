@@ -133,8 +133,103 @@
  *         message:
  *           type: string
  *           example: "Reserva creada exitosamente"
+ *         
  *         reserva:
  *           $ref: '#/components/schemas/Reservation'
+ *         
+ *         transaction:
+ *           type: object
+ *           properties:
+ *             id:
+ *               type: string
+ *               example: "1431752-1779562410-59058"
+ *             
+ *             created_at:
+ *               type: string
+ *               format: date-time
+ *             
+ *             finalized_at:
+ *               type: string
+ *               nullable: true
+ *             
+ *             amount_in_cents:
+ *               type: integer
+ *               example: 150000
+ *             
+ *             reference:
+ *               type: string
+ *               example: "ref-16"
+ *             
+ *             customer_email:
+ *               type: string
+ *               example: "alexander.montano@benodo.co"
+ *             
+ *             currency:
+ *               type: string
+ *               example: "COP"
+ *             
+ *             payment_method_type:
+ *               type: string
+ *               example: "BANCOLOMBIA_TRANSFER"
+ *             
+ *             status:
+ *               type: string
+ *               example: "PENDING"
+ *             
+ *             redirect_url:
+ *               type: string
+ *               example: "https://play-now-xm2c.onrender.com/client/payment-result"
+ *             
+ *             payment_method:
+ *               type: object
+ *               properties:
+ *                 type:
+ *                   type: string
+ *                   example: "BANCOLOMBIA_TRANSFER"
+ *                 
+ *                 user_type:
+ *                   type: string
+ *                   example: "PERSON"
+ *                 
+ *                 user_legal_id:
+ *                   type: string
+ *                   example: "1152205322"
+ *                 
+ *                 user_legal_id_type:
+ *                   type: string
+ *                   example: "CC"
+ *                 
+ *                 payment_description:
+ *                   type: string
+ *                   example: "Reserva de cancha PlayNow"
+ *                 
+ *                 extra:
+ *                   type: object
+ *                   properties:
+ *                     is_three_ds:
+ *                       type: boolean
+ *                       example: false
+ *                     
+ *                     async_payment_url:
+ *                       type: string
+ *                       nullable: true
+ *                       example: "https://botonbancolombia.apps.bancolombia.com/web/transfer-gateway/checkout/_KXqRoWdfGv"
+ *             
+ *             customer_data:
+ *               type: object
+ *               properties:
+ *                 full_name:
+ *                   type: string
+ *                   example: "Alexander Montaño"
+ *                 
+ *                 phone_number:
+ *                   type: string
+ *                   example: "3045491946"
+ *         
+ *         paymentUrl:
+ *           type: string
+ *           nullable: true
+ *           example: "https://botonbancolombia.apps.bancolombia.com/web/transfer-gateway/checkout/_KXqRoWdfGv"
  * 
  *     CancelReservationInput:
  *       type: object
