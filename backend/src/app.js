@@ -13,7 +13,6 @@ import roleRoutes from "./routes/roleRoutes.js";
 import dashboardRoutes from "./routes/dashboardRoutes.js";
 import contactRoutes from "./routes/contactRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
-import path from "path";
 
 const app = express();
 
