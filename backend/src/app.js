@@ -13,6 +13,7 @@ import roleRoutes from "./routes/roleRoutes.js";
 import dashboardRoutes from "./routes/dashboardRoutes.js";
 import contactRoutes from "./routes/contactRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
+import path from "path";
 
 const app = express();
 
@@ -35,7 +36,8 @@ app.use("/api/users", user);
 app.use("/api/auth", authRoutes);
 app.use("/api/malls", mallRoutes);
 app.use("/api/courts", courtRoutes);
-app.use("/api/uploads", express.static("uploads"));
+//app.use("/api/uploads", express.static("uploads"));
+app.use( "/api/uploads",express.static(path.resolve("uploads")));
 app.use("/api/reservations", reservationRoutes);
 app.use("/api/sports", sporRoutes);
 app.use("/api/contact", contactRoutes);
